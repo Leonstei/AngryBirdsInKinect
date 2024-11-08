@@ -1,66 +1,118 @@
 // Variablen für den "Vogel" (ein Kreis in diesem Fall)
 
-double DT = 0.06;  // time increment
-double MASS = 1.0;
-double g_acc = +9.8;  // gravity constant
-double times;    // time since start
-double birdX, birdX;    // actual position 
-double vx, vy;    // actual velocity 
-double ax, ay;    // acceleration, currently constant = (0,+9.8)
+PVector slingshotOrigin;    // Ursprung der Steinschleuder
+PVector birdPosition;     // Position des Vogels 
+PVector birdStartPosition;   // Startposition des Vogels
+PVector velocity;     // Geschwindigkeitsvektor bei Freigabe
+PVector stretch;  // Dehnung des Gummibands
+float maxStretch = 120;      // Maximale Länge des Gummibands
 
-   // Y-Position des Vogels
-float birdSize = 20; // Größe des Vogels
+float birdSize = 30; // Größe des Vogels
 
+// Startgeschwindigkeit und Richtung (kann angepasst werden)
+float initialVelocityX = 50;  // Startgeschwindigkeit in X-Richtung
+float initialVelocityY = -30; // Startgeschwindigkeit in Y-Richtung (negativ für Aufwärtsbewegung)
 
+// Beschleunigung und Schwerkraft
+float gravity = 2; // Schwerkraft in Pixeln pro Sekunde²
+float airResistance = 0.01; // Luftwiderstand (optional)
 
+// Zeitmanagement
+float deltaTime = 1.0 ; // Zeit pro Frame (60 FPS)
 
-// Zustand des Vogels (bewegt sich der Vogel oder ruht er?)
+// Geschwindigkeit des Vogels
+float velocityX;
+float velocityY;
+
+// Zustand des Vogels (ob er fliegt oder nicht)
 boolean isFlying = false;
+boolean isDragging = false;
 
-void setup() {
-  fullScreen();
-  resetBird();
-  frameRate(5);
-}
 
-void draw() {
-  //background(255);
 
-  // Vogel nur bewegen, wenn er "fliegt"
+void drawflight(){
+  //background(152,190,100);
+  
+  if (isDragging) {
+    stretch = PVector.sub(birdPosition, slingshotOrigin);
+  }
+  // Begrenze die Länge des Gummibands auf maxStretch
+  if (stretch.mag() > maxStretch) {
+    stretch.setMag(maxStretch);
+    birdPosition = PVector.add(slingshotOrigin, stretch);
+  }
+
+  // Gummiband zeichnen
+  stroke(0);
+  line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+  
   if (isFlying) {
-    
-    vx = velocityX+schritweite*beschleunigungX;
-    vy = velocityY+schritweite*gravity;
+    // Schwerkraft auf die Y-Geschwindigkeit anwenden
+    velocity.y += gravity * deltaTime;
 
-    // Geschwindigkeit auf Position anwenden
-    birdX += velocityX;
-    birdY += velocityY;
+    // Luftwiderstand auf X und Y anwenden, falls gewünscht
+    velocity.x -= velocity.x * airResistance * deltaTime;
+    velocity.y -= velocity.y * airResistance * deltaTime;
+
+    // Position aktualisieren basierend auf der Geschwindigkeit
     
-    // Begrenzung am Boden (simple Boden-Kollision)
-    if (birdY > height - birdSize / 2) {
-      birdY = height - birdSize / 2;
-      velocityY = 0.0;
-      velocityX = 0.0;
-      isFlying = false; // Flug beenden, wenn Boden erreicht
+    birdPosition.x += velocity.x * deltaTime;
+    birdPosition.y += velocity.y * deltaTime;
+    
+    // Boden-Kollision
+    if (birdPosition.y > height - birdSize / 2) {
+      birdPosition.y = height - birdSize / 2;
+      velocity.y = 0;
+      velocity.x = 0;
+      isFlying = false; // Flug beenden
     }
   }
-  
+
   // Vogel zeichnen
   fill(255, 0, 0);
-  ellipse(birdX, birdY, birdSize, birdSize);
+  ellipse(birdPosition.x, birdPosition.y, birdSize, birdSize);
+  
 }
+
 
 // Funktion zum Neustarten des Vogels
 void resetBird() {
-  birdX = 50;            // Startposition in X
-  birdY = height - 50;   // Startposition in Y (über dem Boden)
-  velocityX = 8;         // Startgeschwindigkeit in X
-  velocityY = -15;       // Startgeschwindigkeit in Y
-  isFlying = true;       // Setzt den Zustand auf "fliegend"
+  birdPosition.x = birdStartPosition.x;       // Startposition in X
+  birdPosition.y = birdStartPosition.y;       // Startposition in Y
+  velocity.x = 0;                 // Startgeschwindigkeit in X
+  velocity.y = 0;                 // Startgeschwindigkeit in Y
+              // Setzt den Zustand auf "fliegend"
 }
 
-// Funktion zum Auslösen des Vogels mit der Maus (oder Kinect später)
+
+
+
 void mousePressed() {
+  // Überprüfen, ob der Vogel gedrückt wird
+  if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) < 15) {
+    isDragging = true;
+  }
+}
+
+void mouseDragged() {
+  // Wenn der Vogel gezogen wird, aktualisiere seine Position
+  if (isDragging) {
+    birdPosition.set(mouseX, mouseY);
+  }
+}
+
+void mouseReleased() {
+  // Wenn der Vogel losgelassen wird, berechne die Release-Geschwindigkeit
+  if (isDragging) {
+    float power = 0.3; // Anpassungsfaktor für die Stärke
+    velocity = PVector.sub(slingshotOrigin, birdPosition).mult(power); 
+    isDragging = false;  // Beendet das Ziehen
+    isFlying = true;
+  }
+}
+
+// Funktion zum Auslösen des Vogels mit Keybord (oder Kinect später)
+void keyPressed() {
   if (!isFlying) {
     resetBird(); // Nur neu starten, wenn der Vogel am Boden ist
   }
