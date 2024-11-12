@@ -1,5 +1,3 @@
-// Variablen für den "Vogel" (ein Kreis in diesem Fall)
-
 PVector slingshotOrigin;    // Ursprung der Steinschleuder
 PVector birdPosition;     // Position des Vogels 
 PVector birdStartPosition;   // Startposition des Vogels
@@ -55,7 +53,6 @@ void drawflight(){
     velocity.y -= velocity.y * airResistance * deltaTime;
 
     // Position aktualisieren basierend auf der Geschwindigkeit
-    
     birdPosition.x += velocity.x * deltaTime;
     birdPosition.y += velocity.y * deltaTime;
     
@@ -81,7 +78,6 @@ void resetBird() {
   birdPosition.y = birdStartPosition.y;       // Startposition in Y
   velocity.x = 0;                 // Startgeschwindigkeit in X
   velocity.y = 0;                 // Startgeschwindigkeit in Y
-              // Setzt den Zustand auf "fliegend"
 }
 
 
