@@ -6,19 +6,22 @@ SimpleOpenNI kinect;
 
 Serial myPort;  // Create object from Serial class
 PImage backgroundImage;
+PImage blackHand;
 
 void setup() {
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser();
-  size(1280, 480);
+  size(1280, 480,P3D);
   fill(255, 0, 0);
   kinect.setMirror(true);
 
   //Open the serial port
   //String portName = Serial.list()[1]; //change the 0 to a 1 or 2 etc. to match your port
   //myPort = new Serial(this, portName, 9600);
-  backgroundImage = loadImage("angry_birds_background.jpg"); // Ersetze "background.png" mit dem Pfad zu deinem Bild
+  backgroundImage = loadImage("angry_birds_background.jpg");
+  blackHand = loadImage("black-hand.png");
+  
 
   // Überprüfen, ob das Bild die richtige Größe hat
   if (backgroundImage.width != width || backgroundImage.height != height) {
@@ -34,6 +37,14 @@ void setup() {
   // Startposition des Vogels auf die Ursprungsposition setzen
   birdPosition = birdStartPosition.copy();
   
+  beginShape();
+  texture(blackHand);
+  vertex(0, 0,0,0);
+  vertex(0 +100, 0,100,0);
+  vertex(0+100, 0+100,100,100);
+  vertex(0, 0+100,0,100);
+  endShape(CLOSE);
+  
 }
 
 void draw() {
@@ -42,6 +53,8 @@ void draw() {
   //fill(150);
   //rect(0, 0, 640, height);
   image(backgroundImage, 0, 0);
+  
+  
   
   fill(120, 70, 30);
   rect(slingshotOrigin.x - 5, slingshotOrigin.y, 10, 50);
@@ -110,8 +123,15 @@ void drawJoint(int userId, int jointId) {
   }
   PVector convertedJoint = new PVector();
   kinect.convertRealWorldToProjective(joint, convertedJoint);
-  fill(255, 0, 0);
-  ellipse(convertedJoint.x, convertedJoint.y, 100, 100);
+  //fill(255, 0, 0);
+  beginShape();
+  texture(blackHand);
+  vertex(convertedJoint.x, convertedJoint.y,0,0);
+  vertex(convertedJoint.x +100, convertedJoint.y,100,0);
+  vertex(convertedJoint.y+100, convertedJoint.y+100,100,100);
+  vertex(convertedJoint.x, convertedJoint.y+100,0,100);
+  endShape(CLOSE);
+  //ellipse(convertedJoint.x, convertedJoint.y, 100, 100);
 }
 //Generate the angle
 float angleOf(PVector one, PVector two, PVector axis) {

@@ -18,9 +18,6 @@ float airResistance = 0.01; // Luftwiderstand (optional)
 // Zeitmanagement
 float deltaTime = 1.0 ; // Zeit pro Frame (60 FPS)
 
-// Geschwindigkeit des Vogels
-float velocityX;
-float velocityY;
 
 // Zustand des Vogels (ob er fliegt oder nicht)
 boolean isFlying = false;
