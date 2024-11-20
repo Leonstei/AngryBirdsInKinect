@@ -85,8 +85,10 @@ void drawJoint(int userId, int jointId) {
 
   PVector convertedJoint = new PVector();
   kinect.convertRealWorldToProjective(joint, convertedJoint);
+
   convertedJoint.x = map(convertedJoint.x, 0, 640, -420, 2160);
   convertedJoint.y = map(convertedJoint.y, 0, 480, -240, 1680);
+
 
   if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
     rightHand.set(convertedJoint.x, convertedJoint.y);
