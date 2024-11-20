@@ -3,7 +3,7 @@ import processing.serial.*;
 
 SimpleOpenNI kinect;
 
-PImage backgroundImage, blackHand, handOpen, slingshotImage, birdImage;
+PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingshotImage, birdImage;
 PVector rightHand, leftHand;
 int count = 0;
 Bird bird;
@@ -14,8 +14,8 @@ void setup() {
   kinect.enableDepth();
   kinect.enableUser();
   kinect.setMirror(true);
-  
-  size(1280, 480);
+  fullScreen();
+  //size(1280, 480);
 
   // Hände initialisieren
   rightHand = new PVector(0, 0);
@@ -23,8 +23,9 @@ void setup() {
 
   // Bilder laden
   backgroundImage = loadImage("angry_birds_background.jpg");
-  blackHand = loadImage("black-hand.png");
-  handOpen = loadImage("hand.png");
+  rightHandOpen = loadImage("rightHandOpen.png");
+  handClosed = loadImage("leftHandClosed.png");
+  handOpen = loadImage("leftHandOpen.png");
   slingshotImage = loadImage("slingshotfin.png");
   birdImage = loadImage("grover2.png");
 
@@ -85,6 +86,9 @@ void drawJoint(int userId, int jointId) {
   PVector convertedJoint = new PVector();
   kinect.convertRealWorldToProjective(joint, convertedJoint);
 
+  convertedJoint.x = map(convertedJoint.x, 0, 640, -420, 2160);
+  convertedJoint.y = map(convertedJoint.y, 0, 480, -240, 1680);
+
 
   if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
     rightHand.set(convertedJoint.x, convertedJoint.y);
@@ -107,7 +111,13 @@ void drawJoint(int userId, int jointId) {
   }
 
   // Hand-Symbol zeichnen
-  image(handOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  if(count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND){
+    image(handClosed, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  }else if(jointId == SimpleOpenNI.SKEL_RIGHT_HAND){
+    image(rightHandOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  }else{
+    image(handOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  }
 }
 
 void mousePressed() {
