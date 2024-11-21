@@ -47,11 +47,11 @@ void setup() {
   }
   
   // Ursprungsposition der Schleuder definieren
-  slingshotOrigin = new PVector(200, height-275);
+  slingshotOrigin = new PVector(150, height-330);
   //slingshotOrigin = new PVector(200, height - 150);
   velocity = new PVector(0, 0);
   //birdStartPosition = slingshotOrigin.copy();
-  birdStartPosition = new PVector(150, 325);
+  birdStartPosition = new PVector(150, 150);
   stretch = new PVector(0, 0);
   
   // Startposition des Vogels auf die Ursprungsposition setzen
@@ -68,7 +68,7 @@ void draw() {
   
   fill(120, 70, 30);
   //rect(slingshotOrigin.x - 5, slingshotOrigin.y, 10, 50);  
-  image(slingstand, birdStartPosition.x-20, birdStartPosition.y-165, 260/2, 490/2);
+  image(slingstand,slingshotOrigin.x-25, slingshotOrigin.y, 260/2, 490/2);
   fox();
   
   //image(loadImage("slingshotfin.png"), -100, height);

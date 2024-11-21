@@ -18,7 +18,7 @@ float gravity = 2; // Schwerkraft in Pixeln pro Sekunde²
 float airResistance = 0.01; // Luftwiderstand (optional)
 
 // Zeitmanagement
-float deltaTime = 1.0 ; // Zeit pro Frame (60 FPS)
+float deltaTime = 0.3 ; // Zeit pro Frame (60 FPS)
 
 
 // Zustand des Vogels (ob er fliegt oder nicht)
@@ -31,6 +31,10 @@ void drawflight(){
   
   if (isDragging) {
     stretch = PVector.sub(birdPosition, slingshotOrigin);
+   
+  image(rubberBack, slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+  image(rubberFront,slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+    
   }
   // Begrenze die Länge des Gummibands auf maxStretch
   if (stretch.mag() > maxStretch) {
@@ -40,9 +44,11 @@ void drawflight(){
 
   // Gummiband zeichnen
   //stroke(0);
-  image(rubberBack, slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
-  image(rubberFront,slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
-  line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+  
+  
+  if(!isFlying){    
+   line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+  }
   
   if (isFlying) {
     // Schwerkraft auf die Y-Geschwindigkeit anwenden
