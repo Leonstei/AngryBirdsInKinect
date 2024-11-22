@@ -49,8 +49,9 @@ void draw() {
   kinect.update();
 
   // Hintergrund zeichnen
-  image(backgroundImage, 0, 0);
-  zoom();
+zoom();
+
+  
 
   // Schleuder zeichnen
   image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
@@ -62,7 +63,7 @@ void draw() {
 
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-
+//Kinect Abschnitt
 
 
   // Kinect-Benutzer verfolgen
@@ -130,17 +131,19 @@ void drawJoint(int userId, int jointId) {
     image(handOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
   }
   
-
-
-
 }
+//--------------------------------------------------------------------------------------------------------------
+//Void Abschnitt
 void zoom(){
- //Zoom In
+ //Zoom In und Out
+ //Beim Reinzoomen kann man nach links und rechts wischen um den Rest des Bildschirms zu sehen.
+  float centerX = mouseX - (mouseX - width / 2) * zoom;
+  float centerY = mouseY - (mouseY - height / 2) * zoom;
+  imageMode(CENTER); //zentriert das Bild (sonst wird die linke obere Ecke an die Mitte positioniert)
+  image(backgroundImage, centerX, centerY, backgroundImage.width * zoom, backgroundImage.height * zoom);
   if (mousePressed)
-    if      (mouseButton == CENTER)   zoom += inc;
-    else if (mouseButton == RIGHT && zoom > 1)  zoom -= inc;
-  scale(zoom);
-image(backgroundImage,0,0);
+    if      (mouseButton == CENTER)   zoom += inc; //Mittlere Maustaste klicken um Bild zu vergrößern.
+    else if (mouseButton == RIGHT && zoom > 1)  zoom -= inc; //Rechte Maustaste um Bild zu verkleinern.
 }
 
 void mousePressed() {
