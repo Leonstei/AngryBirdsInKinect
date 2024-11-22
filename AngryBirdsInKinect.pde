@@ -1,97 +1,79 @@
 import SimpleOpenNI.*;
 import processing.serial.*;
 
-//Generate a SimpleOpenNI object
 SimpleOpenNI kinect;
 
-Serial myPort;  // Create object from Serial class
-PImage backgroundImage;
-PImage bird;
-PImage slingstand;
-PImage fox;
-PImage rectmatwoodhor;
-PImage rectmatwoodver;
-PImage rubberFront;
-PImage rubberBack;
-int slingdifx = 75;
-int slingdify = 0;
-
+PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingstand, birdImage, fox, backr, frontr;
+PVector rightHand, leftHand;
+float zoom = 1;
+final static float inc = 0.2;
+int count = 0;
+Bird bird;
 
 void setup() {
-  //fullScreen();
-  backgroundImage = loadImage("angry_birds_background.jpg");
-  bird = loadImage("grover1.png");
-  slingstand = loadImage("slingshotempty.png");
-  fox = loadImage("foxenemy1.png");
-  rectmatwoodhor = loadImage("woodplankwaagprot.png");
-  rectmatwoodver= loadImage("woodplanksenkprot.png");
-  rubberFront=loadImage("rubberbandfront.png");
-  rubberBack=loadImage("rubberbandback.png");
-  
-  
+  // Kinect-Einstellungen
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser();
-  size(1280, 480);
-  fill(255, 0, 0);
   kinect.setMirror(true);
+  fullScreen();
+  //size(1920, 1080,P3D);
 
-  //Open the serial port
-  //String portName = Serial.list()[1]; //change the 0 to a 1 or 2 etc. to match your port
-  //myPort = new Serial(this, portName, 9600);
-   // Ersetze "background.png" mit dem Pfad zu deinem Bild
+  // Hände initialisieren
+  rightHand = new PVector(0, 0);
+  leftHand = new PVector(0, 0);
 
-  // Überprüfen, ob das Bild die richtige Größe hat
+  // Bilder laden
+  backgroundImage = loadImage("background.png");
+  rightHandOpen = loadImage("handkinectr.png");
+  handClosed = loadImage("handkinectclosedr.png");
+  handOpen = loadImage("handkinect.png");
+  slingstand = loadImage("slingshotempty.png");
+  birdImage = loadImage("grover1.png");
+  backr= loadImage("rubberbandback.png");
+  frontr= loadImage("rubberbandfront.png");
+  fox= loadImage("foxenemy1.png");
+
+  // Hintergrundbildgröße überprüfen und anpassen
   if (backgroundImage.width != width || backgroundImage.height != height) {
     backgroundImage.resize(width, height);
   }
-  
-  // Ursprungsposition der Schleuder definieren
-  slingshotOrigin = new PVector(150, height-330);
-  //slingshotOrigin = new PVector(200, height - 150);
-  velocity = new PVector(0, 0);
-  //birdStartPosition = slingshotOrigin.copy();
-  birdStartPosition = new PVector(150, 150);
-  stretch = new PVector(0, 0);
-  
-  // Startposition des Vogels auf die Ursprungsposition setzen
-  birdPosition = birdStartPosition.copy();
-  
+
+  // Vogel-Objekt initialisieren
+  PVector slingshotOrigin = new PVector(200, height - 150);
+  bird = new Bird(slingshotOrigin, birdImage);
 }
 
 void draw() {
+  // Kinect-Update
   kinect.update();
-  //image(kinect.depthImage(), 640, 0);
-  //fill(150);
-  //rect(0, 0, 640, height);
+
+  // Hintergrund zeichnen
   image(backgroundImage, 0, 0);
-  
-  fill(120, 70, 30);
-  //rect(slingshotOrigin.x - 5, slingshotOrigin.y, 10, 50);  
-  image(slingstand,slingshotOrigin.x-25, slingshotOrigin.y, 260/2, 490/2);
+  zoom();
+
+  // Schleuder zeichnen
+  image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
   fox();
-  
-  //image(loadImage("slingshotfin.png"), -100, height);
-  //scale(5);
-  //image(loadImage("grover2.png"), 0, 0);
-  drawflight();
+
+  // Vogelbewegung und Zeichnung
+  bird.drawFlight();
 
 
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+  // Kinect-Benutzer verfolgen
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
 
   if (userList.size() > 0) {
     int userId = userList.get(0);
-    //If we detect one user we have to draw it
+
     if (kinect.isTrackingSkeleton(userId)) {
-      //User connected
-      //onNewUser(kinect, userId);
-      //Draw the skeleton user
       drawSkeleton(userId);
-      // show the angles on the screen for debugging
-      fill(255, 0, 0);
-      scale(3);
-      //text("shoulder: " + int(shoulderAngle) + "\n" + " elbow: " + int(elbowAngle), 20, 20);
     }
   }
 }
@@ -100,7 +82,6 @@ void drawSkeleton(int userId) {
   stroke(5);
   strokeWeight(5);
 
-
   drawJoint(userId, SimpleOpenNI.SKEL_RIGHT_HAND);
   drawJoint(userId, SimpleOpenNI.SKEL_LEFT_HAND);
 }
@@ -108,20 +89,78 @@ void drawSkeleton(int userId) {
 void drawJoint(int userId, int jointId) {
   PVector joint = new PVector();
   float confidence = kinect.getJointPositionSkeleton(userId, jointId, joint);
-  if (confidence < 0.9) {
+
+  if (confidence < 0.8) {
     return;
   }
+
   PVector convertedJoint = new PVector();
   kinect.convertRealWorldToProjective(joint, convertedJoint);
-  fill(255, 0, 0);
-  ellipse(convertedJoint.x, convertedJoint.y, 100, 100);
+
+  convertedJoint.x = map(convertedJoint.x, 0, 640, -420, 2160);
+  convertedJoint.y = map(convertedJoint.y, 0, 480, -240, 1680);
+
+
+  if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
+    rightHand.set(convertedJoint.x, convertedJoint.y);
+  } else if (jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
+    leftHand.set(convertedJoint.x, convertedJoint.y);
+  }
+
+  // Kinect-Interaktion mit dem Vogel
+  if (dist(convertedJoint.x, convertedJoint.y, bird.birdPosition.x, bird.birdPosition.y) < 20) {
+    count++;
+  }
+
+  if (count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
+    bird.startDragging(convertedJoint);
+    // Wenn Hände sich senken, wird der Vogel losgelassen
+    if ( rightHand.y < 50 ) {
+      count = 0;
+      bird.releaseWithPower(0.4);
+    }
+  }
+
+  // Hand-Symbol zeichnen
+  if(count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND){
+    image(handClosed, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  }else if(jointId == SimpleOpenNI.SKEL_RIGHT_HAND){
+    image(rightHandOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  }else{
+    image(handOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  }
+  
+
+
+
 }
-//Generate the angle
-float angleOf(PVector one, PVector two, PVector axis) {
-  PVector limb = PVector.sub(two, one);
-  return degrees(PVector.angleBetween(limb, axis));
+void zoom(){
+ //Zoom In
+  if (mousePressed)
+    if      (mouseButton == CENTER)   zoom += inc;
+    else if (mouseButton == RIGHT && zoom > 1)  zoom -= inc;
+  scale(zoom);
+image(backgroundImage,0,0);
 }
-//Calibration not required
+
+void mousePressed() {
+  bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
+}
+
+void mouseDragged() {
+  bird.handleMouseDragged(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
+}
+
+void mouseReleased() {
+  bird.handleMouseReleased(); // Maus-Interaktion an Vogel delegieren
+}
+
+void keyPressed() {
+  if (!bird.isFlying) {
+    bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
+  }
+}
+
 void onNewUser(SimpleOpenNI kinect, int userId) {
   println("Start skeleton tracking");
   kinect.startTrackingSkeleton(userId);
