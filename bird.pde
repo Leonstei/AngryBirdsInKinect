@@ -6,6 +6,7 @@ class Bird {
   PVector stretch;            // Dehnung des Gummibands
   float maxStretch = 120;     // Maximale Länge des Gummibands
   float birdSize = 30;        // Größe des Vogels
+ 
   
   // Physikalische Eigenschaften
   float gravity = 2;          // Schwerkraft in Pixeln pro Sekunde²
@@ -22,13 +23,13 @@ class Bird {
     this.birdStartPosition = slingshotOrigin.copy();
     this.stretch = new PVector(0, 0);
     this.birdPosition = birdStartPosition.copy();
-    image(birdImage,this.birdPosition.x, this.birdPosition.y);
+    //image(birdImage,this.birdPosition.x, this.birdPosition.y);
    
        
   }
   
 
-  void drawFlight() {
+  void drawFlight(float zoom, float CenterX, float CenterY) {
     //slingshotOrigin= new PVector(200,400);
     // Berechne die Dehnung des Gummibands, wenn der Vogel gezogen wird
     if (isDragging) {
@@ -43,9 +44,9 @@ class Bird {
 
     // Zeichne das Gummiband
     stroke(0);
-    //image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
-    line(slingshotOrigin.x+70, slingshotOrigin.y-120, birdPosition.x, birdPosition.y);
 
+    line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+ //image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
     // Flugbewegung
     if (isFlying) {
       // Schwerkraft auf die Y-Geschwindigkeit anwenden
@@ -56,8 +57,10 @@ class Bird {
       velocity.y -= velocity.y * airResistance * deltaTime;
 
       // Position aktualisieren basierend auf der Geschwindigkeit
-      birdPosition.x += velocity.x * deltaTime;
-      birdPosition.y += velocity.y * deltaTime;
+      birdPosition.x += (velocity.x * deltaTime);
+      birdPosition.y += (velocity.y * deltaTime);
+      CenterX += (velocity.x * deltaTime);
+      CenterY += (velocity.y * deltaTime);
 
       // Boden-Kollision
       if (birdPosition.y > height - birdSize / 2) {
@@ -69,8 +72,13 @@ class Bird {
     }
 
     // Vogel zeichnen
-    fill(255, 0, 0);
-    image(birdImage, birdPosition.x+35, birdPosition.y-150, 305/4,305/4);
+    
+    //image(birdImage, birdPosition.x, birdPosition.y, 305/4*zoom,305/4*zoom);
+    float offSetX=730*zoom;
+    float offSetY=275*zoom;
+    float newCenterX= CenterX-offSetX;
+    float newCenterY= CenterY+offSetY;
+    image(birdImage, newCenterX, newCenterY, 305/4*zoom,305/4*zoom);
     //ellipse(birdPosition.x, birdPosition.y, birdSize, birdSize);
   }
 

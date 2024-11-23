@@ -3,10 +3,10 @@ import processing.serial.*;
 
 SimpleOpenNI kinect;
 
-PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingstand, birdImage, fox, backr, frontr;
+PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingstand, slingstandfr, birdImage, fox, backr, frontr;
 PVector rightHand, leftHand;
 float zoom = 1;
-final static float inc = 0.2;
+final static float inc = 0.1;
 int count = 0;
 Bird bird;
 
@@ -29,6 +29,7 @@ void setup() {
   handClosed = loadImage("handkinectclosedr.png");
   handOpen = loadImage("handkinect.png");
   slingstand = loadImage("slingshotempty.png");
+  slingstandfr = loadImage("slingshotemptyfr.png");
   birdImage = loadImage("grover1.png");
   backr= loadImage("rubberbandback.png");
   frontr= loadImage("rubberbandfront.png");
@@ -40,25 +41,33 @@ void setup() {
   }
 
   // Vogel-Objekt initialisieren
-  PVector slingshotOrigin = new PVector(200, height - 150);
+  PVector slingshotOrigin = new PVector(235, height - 280);
   bird = new Bird(slingshotOrigin, birdImage);
 }
 
 void draw() {
   // Kinect-Update
   kinect.update();
-
-  // Hintergrund zeichnen
-zoom();
-
-  
-
-  // Schleuder zeichnen
-  image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
-  fox();
+ //Zoom In und Out
+ //Beim Reinzoomen kann man nach links und rechts wischen um den Rest des Bildschirms zu sehen.
+  float centerX = mouseX - (mouseX - width/2) * zoom; //X Koordinate für Zoom auf Mauszeiger
+  float centerY = mouseY - (mouseY - height/2) * zoom; //Y Koordinate für Zoom auf Mauszeiger
+  float slingX = 735*zoom; //Zusätzliche X Variable für die Schleuderposition
+  float slingY = 350*zoom; //Zusätzliche Y Variable für die Schleuderposition
+  imageMode(CENTER); //zentriert das Bild (sonst wird die linke obere Ecke des Hintergrunds an die Mitte positioniert)
+  image(backgroundImage, centerX, centerY, backgroundImage.width * zoom, backgroundImage.height * zoom);
+  image(slingstand,centerX-slingX, centerY+slingY, 260/2*zoom, 490/2*zoom);
 
   // Vogelbewegung und Zeichnung
-  bird.drawFlight();
+  bird.drawFlight(zoom, centerX, centerY);
+  image(slingstandfr,centerX-slingX, centerY+slingY, 260/2*zoom, 490/2*zoom);
+  
+  //Zoom erhöhen/senken
+  if (mousePressed)
+    if      (mouseButton == CENTER && zoom < 1.6)   zoom += inc; //Mittlere Maustaste klicken um Bild zu vergrößern.
+      else if (mouseButton == RIGHT && zoom > 1)  zoom -= inc; //Rechte Maustaste um Bild zu verkleinern.
+
+
 
 
 
@@ -134,17 +143,7 @@ void drawJoint(int userId, int jointId) {
 }
 //--------------------------------------------------------------------------------------------------------------
 //Void Abschnitt
-void zoom(){
- //Zoom In und Out
- //Beim Reinzoomen kann man nach links und rechts wischen um den Rest des Bildschirms zu sehen.
-  float centerX = mouseX - (mouseX - width / 2) * zoom;
-  float centerY = mouseY - (mouseY - height / 2) * zoom;
-  imageMode(CENTER); //zentriert das Bild (sonst wird die linke obere Ecke an die Mitte positioniert)
-  image(backgroundImage, centerX, centerY, backgroundImage.width * zoom, backgroundImage.height * zoom);
-  if (mousePressed)
-    if      (mouseButton == CENTER)   zoom += inc; //Mittlere Maustaste klicken um Bild zu vergrößern.
-    else if (mouseButton == RIGHT && zoom > 1)  zoom -= inc; //Rechte Maustaste um Bild zu verkleinern.
-}
+
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
