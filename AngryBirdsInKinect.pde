@@ -42,7 +42,7 @@ void setup() {
 
   // Vogel-Objekt initialisieren
   PVector slingshotOrigin = new PVector(235, height - 280);
-  bird = new Bird(slingshotOrigin, birdImage);
+  bird = new Bird(slingshotOrigin);
 }
 
 void draw() {

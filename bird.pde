@@ -17,7 +17,7 @@ class Bird {
   boolean isFlying = false;
   boolean isDragging = false;
 
-  Bird(PVector slingshotOrigin,PImage birdImage) {
+  Bird(PVector slingshotOrigin) {
     this.slingshotOrigin = slingshotOrigin;
     this.velocity = new PVector(0, 0);
     this.birdStartPosition = slingshotOrigin.copy();
@@ -45,7 +45,7 @@ class Bird {
     // Zeichne das Gummiband
     stroke(0);
 
-    line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
+    line(slingshotOrigin.x, slingshotOrigin.y, CenterX, CenterY);
  //image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
     // Flugbewegung
     if (isFlying) {
@@ -57,13 +57,15 @@ class Bird {
       velocity.y -= velocity.y * airResistance * deltaTime;
 
       // Position aktualisieren basierend auf der Geschwindigkeit
-      birdPosition.x += (velocity.x * deltaTime);
+     birdPosition.x += (velocity.x * deltaTime);
       birdPosition.y += (velocity.y * deltaTime);
       CenterX += (velocity.x * deltaTime);
       CenterY += (velocity.y * deltaTime);
 
       // Boden-Kollision
-      if (birdPosition.y > height - birdSize / 2) {
+     // if (birdPosition.y > height - birdSize / 2) {
+       // birdPosition.y = height - birdSize / 2;
+        if (CenterY > height - birdSize / 2) {
         birdPosition.y = height - birdSize / 2;
         velocity.y = 0;
         velocity.x = 0;
