@@ -1,12 +1,14 @@
 import SimpleOpenNI.*;
 import processing.serial.*;
 
+
 SimpleOpenNI kinect;
 
 PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingshotImage, birdImage;
 PVector rightHand, leftHand;
+int slingshotSize = 200;
 int count = 0;
-Bird bird;
+Bird bird , bird2;
 
 void setup() {
   // Kinect-Einstellungen
@@ -14,20 +16,20 @@ void setup() {
   kinect.enableDepth();
   kinect.enableUser();
   kinect.setMirror(true);
-  fullScreen();
-  //size(1280, 480);
+  //fullScreen();
+  size(1840, 980);
 
   // Hände initialisieren
   rightHand = new PVector(0, 0);
   leftHand = new PVector(0, 0);
 
   // Bilder laden
-  backgroundImage = loadImage("angry_birds_background.jpg");
+  backgroundImage = loadImage("background.png");
   rightHandOpen = loadImage("rightHandOpen.png");
   handClosed = loadImage("leftHandClosed.png");
   handOpen = loadImage("leftHandOpen.png");
   slingshotImage = loadImage("slingshotfin.png");
-  birdImage = loadImage("grover2.png");
+  birdImage = loadImage("grover1.png");
 
   // Hintergrundbildgröße überprüfen und anpassen
   if (backgroundImage.width != width || backgroundImage.height != height) {
@@ -36,7 +38,8 @@ void setup() {
 
   // Vogel-Objekt initialisieren
   PVector slingshotOrigin = new PVector(200, height - 150);
-  bird = new Bird(slingshotOrigin, birdImage);
+  bird = new Bird(slingshotOrigin);
+  bird2 = new Bird(slingshotOrigin);
 }
 
 void draw() {
@@ -47,17 +50,17 @@ void draw() {
   image(backgroundImage, 0, 0);
 
   // Schleuder zeichnen
-  fill(120, 70, 30);
-  rect(bird.slingshotOrigin.x - 5, bird.slingshotOrigin.y, 10, 50);
-  image(slingshotImage, bird.slingshotOrigin.x - 5, bird.slingshotOrigin.y , 100, 100);
+  //rect(bird.slingshotOrigin.x - 5, bird.slingshotOrigin.y, 10, 50);
+  image(slingshotImage, bird.slingshotOrigin.x - slingshotSize/2 , bird.slingshotOrigin.y -slingshotSize/2, slingshotSize, slingshotSize);
 
   // Vogelbewegung und Zeichnung
   bird.drawFlight();
-
+  
   // Kinect-Benutzer verfolgen
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
-
+  
+  
   if (userList.size() > 0) {
     int userId = userList.get(0);
 
@@ -65,6 +68,7 @@ void draw() {
       drawSkeleton(userId);
     }
   }
+  
 }
 
 void drawSkeleton(int userId) {
