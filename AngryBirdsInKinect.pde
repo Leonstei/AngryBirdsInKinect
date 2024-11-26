@@ -8,6 +8,8 @@ PVector rightHand, leftHand;
 float zoom = 1;
 final static float inc = 0.1;
 int count = 0;
+   int status = 0;
+   int step = 100;
 Bird bird;
 
 void setup() {
@@ -57,10 +59,30 @@ void draw() {
   imageMode(CENTER); //zentriert das Bild (sonst wird die linke obere Ecke des Hintergrunds an die Mitte positioniert)
   image(backgroundImage, centerX, centerY, backgroundImage.width * zoom, backgroundImage.height * zoom);
   image(slingstand,centerX-slingX, centerY+slingY, 260/2*zoom, 490/2*zoom);
+  if(status==1){
+   textSize(100);
+   fill(10);
+   text("Mode: Building", 100, 100);
+   for(int i = 0; i < width/step; i++ ) {
+     line(i*step, 0, i*step, height);
+     line(0, i*step, width, i*step);
+     } 
+   } else {
+      textSize(100);
+      fill(10);
+      text("Mode: Play", 100, 100);
+}
+
 
   // Vogelbewegung und Zeichnung
   bird.drawFlight(zoom, centerX, centerY);
   image(slingstandfr,centerX-slingX, centerY+slingY, 260/2*zoom, 490/2*zoom);
+  textSize(15);
+  fill(10);
+  text("Instructions:",1550,20);
+  text("Press right or center mouse button to zoom.",1550,40);
+  text("Press 'b' or 'p' to turn grid on/off. Press '+'",1550,60);
+  text("or '-' to increase grid width.",1550,80);
   
   //Zoom erhöhen/senken
   if (mousePressed)
@@ -158,10 +180,32 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-  if (!bird.isFlying) {
-    bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
-  }
+      if(key == 'b' && status != 1){
+        println("Mode switched to Building"); 
+        //text("Mode switched to Building", 100, 100);
+        status = 1;
+    }
+  
+    if(key == 'p' && status == 1){
+        println("Mode switched to Play");
+        //text("Mode switched to Play", 100, 100);
+        status = 0;
+    }
+    if(key == 'r'){
+      if(!bird.isFlying){
+        bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
+      }  
+    }
+  
+    if(key == '+' && step < 150){
+      step += 10;
+    }
+    
+    if(key == '-' && step > 50){
+      step -= 10;
+    }
 }
+
 
 void onNewUser(SimpleOpenNI kinect, int userId) {
   println("Start skeleton tracking");

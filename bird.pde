@@ -6,6 +6,7 @@ class Bird {
   PVector stretch;            // Dehnung des Gummibands
   float maxStretch = 120;     // Maximale Länge des Gummibands
   float birdSize = 30;        // Größe des Vogels
+  PVector Center;
  
   
   // Physikalische Eigenschaften
@@ -16,6 +17,9 @@ class Bird {
   // Zustand
   boolean isFlying = false;
   boolean isDragging = false;
+  
+  ArrayList<PVector> trail=new ArrayList<PVector>();// Liste für die Spur
+  float trailSize = 5;
 
   Bird(PVector slingshotOrigin) {
     this.slingshotOrigin = slingshotOrigin;
@@ -31,21 +35,23 @@ class Bird {
 
   void drawFlight(float zoom, float CenterX, float CenterY) {
     //slingshotOrigin= new PVector(200,400);
+     drawTrail();
+     Center = new PVector(CenterX, CenterY);
     // Berechne die Dehnung des Gummibands, wenn der Vogel gezogen wird
     if (isDragging) {
-      stretch = PVector.sub(birdPosition, slingshotOrigin);
+      stretch = PVector.sub(Center, slingshotOrigin);
     }
 
     // Begrenze die Länge des Gummibands auf maxStretch
     if (stretch.mag() > maxStretch) {
       stretch.setMag(maxStretch);
-      birdPosition = PVector.add(slingshotOrigin, stretch);
+      Center = PVector.add(slingshotOrigin, stretch);
     }
 
     // Zeichne das Gummiband
     stroke(0);
 
-    line(slingshotOrigin.x, slingshotOrigin.y, CenterX, CenterY);
+    line(slingshotOrigin.x, slingshotOrigin.y, Center.x, Center.y);
  //image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
     // Flugbewegung
     if (isFlying) {
@@ -90,6 +96,14 @@ class Bird {
     isFlying = false;
   }
 
+void drawTrail() {
+  fill(255, 0, 0, 150); // Transparente rote Punkte
+  noStroke();
+  for (PVector position : trail) {
+    ellipse(position.x, position.y, trailSize, trailSize);
+  }
+}
+
   void handleMousePressed(float mouseX, float mouseY) {
     // Überprüfen, ob der Vogel gedrückt wird
     if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) < birdSize / 2) {
@@ -123,5 +137,6 @@ class Bird {
     isDragging = false;
     isFlying = true;
   }
+
 
 }
