@@ -1,15 +1,21 @@
+import shiffman.box2d.*;
+
 import SimpleOpenNI.*;
 import processing.serial.*;
 
 SimpleOpenNI kinect;
 
-PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingstand, slingstandfr, birdImage, fox, backr, frontr;
+PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingstand, slingstandfr, birdImage, fox, backr, frontr, glassno, woodno, stoneno;
 PVector rightHand, leftHand;
-float zoom = 1;
-final static float inc = 0.1;
+PVector blockpos; //Koordinaten vom Editorblock
+float zoom = 1; //Zoomfaktor
+final static float inc = 0.1; // Zoomschrittweite
 int count = 0;
-   int status = 0;
-   int step = 100;
+int status = 0; //um zwischen den Modi zu wechseln
+int step = 100; //um den Raster zu vergrößern/schrumpfen
+boolean isDraggingBlock= false; //um Blöcke vom Editor aufzunehmen
+//PVector buildpos;
+int blockstatus = 0;
 Bird bird;
 
 void setup() {
@@ -24,18 +30,23 @@ void setup() {
   // Hände initialisieren
   rightHand = new PVector(0, 0);
   leftHand = new PVector(0, 0);
+  
+  blockpos = new PVector(1800,100);
 
   // Bilder laden
-  backgroundImage = loadImage("background.png");
-  rightHandOpen = loadImage("handkinectr.png");
-  handClosed = loadImage("handkinectclosedr.png");
-  handOpen = loadImage("handkinect.png");
-  slingstand = loadImage("slingshotempty.png");
-  slingstandfr = loadImage("slingshotemptyfr.png");
-  birdImage = loadImage("grover1.png");
-  backr= loadImage("rubberbandback.png");
-  frontr= loadImage("rubberbandfront.png");
-  fox= loadImage("foxenemy1.png");
+  backgroundImage = loadImage("background.png"); //Hintergrund
+  rightHandOpen = loadImage("handkinectr.png"); //Rechte Kinecthand
+  handClosed = loadImage("handkinectclosedr.png"); // Rechte geschlossene Kinecthand
+  handOpen = loadImage("handkinect.png"); //Linke Kinecthand
+  slingstand = loadImage("slingshotempty.png"); //Offene Schleuder ohne Gummiband
+  slingstandfr = loadImage("slingshotemptyfr.png"); //Vorderteil der Schleuder
+  birdImage = loadImage("grover1.png"); //Vogel
+  backr= loadImage("rubberbandback.png"); //Hinterteil Gummiband
+  frontr= loadImage("rubberbandfront.png"); //Vorderteil Gummiband
+  fox= loadImage("foxenemy1.png"); //Fuchs/Gegner
+  glassno= loadImage("gsnodmg.png"); //Senkrechter Glassblock ohne Schaden
+  woodno= loadImage("wpsnodmg.png"); //Senkrechter Holzblock ohne Schaden
+  stoneno= loadImage("stsnodmg.png"); //Senkrechter Steinblock ohne Schaden
 
   // Hintergrundbildgröße überprüfen und anpassen
   if (backgroundImage.width != width || backgroundImage.height != height) {
@@ -59,11 +70,22 @@ void draw() {
   imageMode(CENTER); //zentriert das Bild (sonst wird die linke obere Ecke des Hintergrunds an die Mitte positioniert)
   image(backgroundImage, centerX, centerY, backgroundImage.width * zoom, backgroundImage.height * zoom);
   image(slingstand,centerX-slingX, centerY+slingY, 260/2*zoom, 490/2*zoom);
+  
+  if(blockstatus==1){
+  image(glassno,blockpos.x,blockpos.y, 50, 150);  
+  }
+  //Baumodus
   if(status==1){
+  image(glassno, 1800,100, 50, 150); //Blockauswahl
+  //handleMousePressedBlock(mouseX,mouseY); //Block klickbar
+  //handleMouseDraggedBlock(mouseX,mouseY); //Block ziehbar machen
+
+  
    textSize(100);
    fill(10);
    text("Mode: Building", 100, 100);
    for(int i = 0; i < width/step; i++ ) {
+     
      line(i*step, 0, i*step, height);
      line(0, i*step, width, i*step);
      } 
@@ -86,7 +108,7 @@ void draw() {
   
   //Zoom erhöhen/senken
   if (mousePressed)
-    if      (mouseButton == CENTER && zoom < 1.6)   zoom += inc; //Mittlere Maustaste klicken um Bild zu vergrößern.
+    if (mouseButton == CENTER && zoom < 1.6)   zoom += inc; //Mittlere Maustaste klicken um Bild zu vergrößern.
       else if (mouseButton == RIGHT && zoom > 1)  zoom -= inc; //Rechte Maustaste um Bild zu verkleinern.
 
 
@@ -169,15 +191,50 @@ void drawJoint(int userId, int jointId) {
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
+  handleMousePressedBlock(mouseX,mouseY);
 }
 
 void mouseDragged() {
   bird.handleMouseDragged(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
+  handleMouseDraggedBlock(mouseX,mouseY);
 }
 
 void mouseReleased() {
   bird.handleMouseReleased(); // Maus-Interaktion an Vogel delegieren
+  handleMouseReleasedBlock();
 }
+
+
+void handleMousePressedBlock(float mouseX, float mouseY) {
+    // Überprüfen, ob der Block gedrückt wird
+    
+    if (dist(mouseX, mouseY, blockpos.x, blockpos.y) < 15) {
+      //count++;
+      isDraggingBlock = true;
+      blockstatus=1;
+    }
+  }
+
+void handleMouseDraggedBlock(float mouseX, float mouseY) {
+    // Aktualisiere die Blockposition, wenn gezogen wird
+    if(isDraggingBlock == true) { 
+      //testblock2=testblock.copy();
+      //ellipse(testblock.x,testblock.y,100,100);
+      //image(glassno,testblock.x,testblock.y, 50, 150);
+      blockpos.set(mouseX, mouseY);
+      
+    }
+  }
+
+void handleMouseReleasedBlock() {
+    if (isDraggingBlock) {
+      
+      isDraggingBlock = false; // Beendet das Ziehen
+      
+    }
+  }
+  
+
 
 void keyPressed() {
       if(key == 'b' && status != 1){

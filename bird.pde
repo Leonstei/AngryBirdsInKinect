@@ -7,6 +7,7 @@ class Bird {
   float maxStretch = 120;     // Maximale Länge des Gummibands
   float birdSize = 30;        // Größe des Vogels
   PVector Center;
+  float trailAge =150;
  
   
   // Physikalische Eigenschaften
@@ -27,6 +28,7 @@ class Bird {
     this.birdStartPosition = slingshotOrigin.copy();
     this.stretch = new PVector(0, 0);
     this.birdPosition = birdStartPosition.copy();
+    //this.Center= birdStartPosition.copy();
     //image(birdImage,this.birdPosition.x, this.birdPosition.y);
    
        
@@ -34,27 +36,33 @@ class Bird {
   
 
   void drawFlight(float zoom, float CenterX, float CenterY) {
+    float offSetX = 730*zoom;
+    float offSetY = 275*zoom;
+    float newCenterX = (CenterX-offSetX);
+    float newCenterY = (CenterY+offSetY);
     //slingshotOrigin= new PVector(200,400);
      drawTrail();
      Center = new PVector(CenterX, CenterY);
     // Berechne die Dehnung des Gummibands, wenn der Vogel gezogen wird
     if (isDragging) {
-      stretch = PVector.sub(Center, slingshotOrigin);
+      stretch = PVector.sub(birdPosition, slingshotOrigin);
     }
 
     // Begrenze die Länge des Gummibands auf maxStretch
     if (stretch.mag() > maxStretch) {
       stretch.setMag(maxStretch);
-      Center = PVector.add(slingshotOrigin, stretch);
+      birdPosition = PVector.add(slingshotOrigin, stretch);
     }
 
     // Zeichne das Gummiband
     stroke(0);
-
-    line(slingshotOrigin.x, slingshotOrigin.y, Center.x, Center.y);
+    float birdCenterX = birdPosition.x*zoom;
+    float birdCenterY = birdPosition.y*zoom;
+    if(isDragging == true)
+    line(slingshotOrigin.x, slingshotOrigin.y, birdCenterX, birdCenterY);
  //image(slingstand,bird.slingshotOrigin.x, bird.slingshotOrigin.y-160, 260/2, 490/2);
     // Flugbewegung
-    if (isFlying) {
+    if (isFlying && status == 0) {
       // Schwerkraft auf die Y-Geschwindigkeit anwenden
       velocity.y += gravity * deltaTime;
 
@@ -63,16 +71,17 @@ class Bird {
       velocity.y -= velocity.y * airResistance * deltaTime;
 
       // Position aktualisieren basierend auf der Geschwindigkeit
-     birdPosition.x += (velocity.x * deltaTime);
+      birdPosition.x += (velocity.x * deltaTime);
       birdPosition.y += (velocity.y * deltaTime);
-      CenterX += (velocity.x * deltaTime);
-      CenterY += (velocity.y * deltaTime);
+      Center.x += (velocity.x * deltaTime);
+      Center.y += (velocity.y * deltaTime);
+      trail.add(birdPosition.copy()); 
 
-      // Boden-Kollision
-     // if (birdPosition.y > height - birdSize / 2) {
+       // Boden-Kollision
+       // if (birdPosition.y > height - birdSize / 2) {
        // birdPosition.y = height - birdSize / 2;
-        if (CenterY > height - birdSize / 2) {
-        birdPosition.y = height - birdSize / 2;
+        if (birdPosition.y > height - birdSize / 2 || birdPosition.y > 980) {
+        birdPosition.y = 980;
         velocity.y = 0;
         velocity.x = 0;
         isFlying = false; // Flug beenden
@@ -82,11 +91,8 @@ class Bird {
     // Vogel zeichnen
     
     //image(birdImage, birdPosition.x, birdPosition.y, 305/4*zoom,305/4*zoom);
-    float offSetX=730*zoom;
-    float offSetY=275*zoom;
-    float newCenterX= CenterX-offSetX;
-    float newCenterY= CenterY+offSetY;
-    image(birdImage, newCenterX, newCenterY, 305/4*zoom,305/4*zoom);
+    
+    image(birdImage, birdPosition.x, birdPosition.y, 305/4*zoom,305/4*zoom);
     //ellipse(birdPosition.x, birdPosition.y, birdSize, birdSize);
   }
 
@@ -97,35 +103,48 @@ class Bird {
   }
 
 void drawTrail() {
-  fill(255, 0, 0, 150); // Transparente rote Punkte
-  noStroke();
+
+
   for (PVector position : trail) {
-    ellipse(position.x, position.y, trailSize, trailSize);
+    fill(255, trailAge); // Transparente weiße Punkte
+    
+    noStroke();
+    ellipse(position.x*zoom, position.y*zoom, trailSize*zoom, trailSize*zoom);
+
+  }
+   
+  trailAge-=1;
+  if (trailAge < 0) {
+    trailAge = 0;
   }
 }
 
   void handleMousePressed(float mouseX, float mouseY) {
     // Überprüfen, ob der Vogel gedrückt wird
-    if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) < birdSize / 2) {
+    if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) < birdSize / 2 && status == 0) {
       isDragging = true;
     }
   }
 
   void handleMouseDragged(float mouseX, float mouseY) {
     // Aktualisiere die Vogelposition, wenn gezogen wird
-    if (isDragging) {
+    if (isDragging && status == 0) {
       birdPosition.set(mouseX, mouseY);
     }
   }
 
   void handleMouseReleased() {
-    if (isDragging) {
+    if (isDragging && status == 0) {
       float power = 0.4; // Anpassungsfaktor für die Stärke
       velocity = PVector.sub(slingshotOrigin, birdPosition).mult(power);
       isDragging = false; // Beendet das Ziehen
       isFlying = true;
     }
   }
+  
+  
+  
+  
   void startDragging(PVector handPosition) {
     isDragging = true;
     //println(handPosition);
