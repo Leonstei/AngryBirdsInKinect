@@ -4,17 +4,20 @@ import processing.serial.*;
 
 SimpleOpenNI kinect;
 
-PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingshotImage, birdImage;
-PVector rightHand, leftHand;
+PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage;
+PVector rightHand, leftHand, screenPos;
 int slingshotSize = 200;
 int count = 0;
 Bird bird , bird2;
+HashMap<Integer, PVector> trackedHands = new HashMap<Integer, PVector>();
 
 void setup() {
   // Kinect-Einstellungen
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
-  kinect.enableUser();
+  kinect.enableHand();    // Aktiviert Hand-Tracking
+  kinect.startGesture(SimpleOpenNI.GESTURE_CLICK);
+  kinect.startGesture(SimpleOpenNI.GESTURE_HAND_RAISE ); // Starte Geste "Wave"
   kinect.setMirror(true);
   //fullScreen();
   size(1840, 980);
@@ -27,7 +30,7 @@ void setup() {
   backgroundImage = loadImage("background.png");
   rightHandOpen = loadImage("rightHandOpen.png");
   handClosed = loadImage("leftHandClosed.png");
-  handOpen = loadImage("leftHandOpen.png");
+  leftHandOpen = loadImage("leftHandOpen.png");
   slingshotImage = loadImage("slingshotfin.png");
   birdImage = loadImage("grover1.png");
 
@@ -38,11 +41,13 @@ void setup() {
 
   // Vogel-Objekt initialisieren
   PVector slingshotOrigin = new PVector(200, height - 150);
+  screenPos = new PVector();
   bird = new Bird(slingshotOrigin);
   bird2 = new Bird(slingshotOrigin);
 }
 
 void draw() {
+  //delay(1000);
   // Kinect-Update
   kinect.update();
 
@@ -55,74 +60,106 @@ void draw() {
 
   // Vogelbewegung und Zeichnung
   bird.drawFlight();
+  drawHand();
   
   // Kinect-Benutzer verfolgen
-  IntVector userList = new IntVector();
-  kinect.getUsers(userList);
+  //IntVector userList = new IntVector();
+  //kinect.getUsers(userList);
   
   
-  if (userList.size() > 0) {
-    int userId = userList.get(0);
+  //if (userList.size() > 0) {
+  //  int userId = userList.get(0);
 
-    if (kinect.isTrackingSkeleton(userId)) {
-      drawSkeleton(userId);
-    }
-  }
+  //  if (kinect.isTrackingSkeleton(userId)) {
+  //    drawSkeleton(userId);
+  //  }
+  //  PVector joint = new PVector();
+  //  kinect.startTrackingHand(joint);
+  //  println(joint);
+  //}
   
 }
 
-void drawSkeleton(int userId) {
-  stroke(5);
-  strokeWeight(5);
+void drawHand(){
+  if(trackedHands.size()==0)return;
+  for (HashMap.Entry<Integer, PVector> entry : trackedHands.entrySet()) {
+    int handId = entry.getKey();
+    PVector handPos = entry.getValue();
+   
+    handPos.x = map(handPos.x, 0, 640, -420, 2160);
+    handPos.y = map(handPos.y, 0, 480, -240, 1680);
 
-  drawJoint(userId, SimpleOpenNI.SKEL_RIGHT_HAND);
-  drawJoint(userId, SimpleOpenNI.SKEL_LEFT_HAND);
-}
-
-void drawJoint(int userId, int jointId) {
-  PVector joint = new PVector();
-  float confidence = kinect.getJointPositionSkeleton(userId, jointId, joint);
-
-  if (confidence < 0.8) {
-    return;
-  }
-
-  PVector convertedJoint = new PVector();
-  kinect.convertRealWorldToProjective(joint, convertedJoint);
-
-  convertedJoint.x = map(convertedJoint.x, 0, 640, -420, 2160);
-  convertedJoint.y = map(convertedJoint.y, 0, 480, -240, 1680);
-
-
-  if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
-    rightHand.set(convertedJoint.x, convertedJoint.y);
-  } else if (jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
-    leftHand.set(convertedJoint.x, convertedJoint.y);
-  }
-
-  // Kinect-Interaktion mit dem Vogel
-  if (dist(convertedJoint.x, convertedJoint.y, bird.birdPosition.x, bird.birdPosition.y) < 20) {
+  decideIfRightOrLeft(handPos);
+  
+  if (dist(handPos.x, handPos.y, bird.birdPosition.x, bird.birdPosition.y) < 30) {
     count++;
   }
-
-  if (count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
-    bird.startDragging(convertedJoint);
+  
+  if (count > 20 && handPos.x < width/2) {
+    bird.startDragging(handPos);
     // Wenn Hände sich senken, wird der Vogel losgelassen
     if ( rightHand.y < 50 ) {
       count = 0;
-      bird.releaseWithPower(0.4);
+      bird.releaseWithPower(1.25);
     }
   }
-
-  // Hand-Symbol zeichnen
-  if(count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND){
-    image(handClosed, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
-  }else if(jointId == SimpleOpenNI.SKEL_RIGHT_HAND){
-    image(rightHandOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+  if(trackedHands.size() == 1){
+    if(handPos.x < width/2){
+      drawLeftHand();
+    }else{
+      drawRightHand();
+    }
   }else{
-    image(handOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+    drawRightHand();
+    drawLeftHand();
+  }
   }
 }
+void drawRightHand(){
+  image(rightHandOpen, rightHand.x - 50, rightHand.y - 50, 100, 100);
+}
+void drawLeftHand(){
+  if(count > 20){
+    image(handClosed, leftHand.x - 50, leftHand.y - 50, 100, 100);
+  }else{
+    image(leftHandOpen, leftHand.x - 50, leftHand.y - 50, 100, 100);
+  }
+}
+
+ void decideIfRightOrLeft(PVector handPos){
+   if(
+   dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100 && 
+   dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) >100
+   ){
+     leftHand.set(handPos.x, handPos.y);
+   }else if(
+     dist(handPos.x, handPos.y, rightHand.x, rightHand.y) < 100 && 
+     dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) > 100
+   ){
+     rightHand.set(handPos.x, handPos.y);
+   }else{
+     if (handPos.x >= width / 2) {
+      rightHand.set(handPos.x, handPos.y);
+    } else {
+      leftHand.set(handPos.x, handPos.y);
+    }
+   }
+ }
+ //if(
+ //  leftHand.x != 0 && leftHand.y != 0 &&
+ //  rightHand.x != 0 && rightHand.y != 0 &&
+ //  dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 
+ //  dist(handPos.x, handPos.y, rightHand.x, rightHand.y)
+   
+ //  ){
+ //    leftHand.set(handPos.x, handPos.y);
+ //  }else if(
+ //  rightHand.x != 0 && rightHand.y != 0 &&
+ //  leftHand.x != 0 && leftHand.y != 0 &&
+ //    dist(handPos.x, handPos.y, rightHand.x, rightHand.y) < 
+ //    dist(handPos.x, handPos.y, leftHand.x, leftHand.y) 
+ //  )
+ 
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
@@ -142,7 +179,27 @@ void keyPressed() {
   }
 }
 
-void onNewUser(SimpleOpenNI kinect, int userId) {
-  println("Start skeleton tracking");
-  kinect.startTrackingSkeleton(userId);
+void onNewHand(SimpleOpenNI curContext, int handId, PVector pos) {
+  //println("Neue Hand erkannt - ID: " + handId + ", Position: " + pos);
+}
+
+void onTrackedHand(SimpleOpenNI curContext, int handId, PVector pos) {
+  PVector screenPos = new PVector();
+  kinect.convertRealWorldToProjective(pos, screenPos);
+  trackedHands.put(handId, screenPos);
+  
+}
+void onLostHand(SimpleOpenNI curContext, int handId) {
+  //println("Hand verloren - ID: " + handId);
+  trackedHands.remove(handId);
+}
+
+void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
+  println("Geste erkannt: " + gestureType + ", Position: " + pos);
+  if(gestureType == 1){
+    println(SimpleOpenNI.GESTURE_CLICK);
+  }
+  // Starte Hand-Tracking
+  int handId = kinect.startTrackingHand(pos);
+  //println("Hand-Tracking gestartet mit ID: " + handId);
 }
