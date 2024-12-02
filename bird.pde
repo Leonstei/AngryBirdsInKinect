@@ -13,13 +13,14 @@ class Bird {
   // Physikalische Eigenschaften
   float gravity = 2;          // Schwerkraft in Pixeln pro Sekunde²
   float airResistance = 0.01; // Luftwiderstand
-  float deltaTime = 1.0;      // Zeit pro Frame (60 FPS)
+  float deltaTime = 0.4;      // Zeit pro Frame (60 FPS)
   
   // Zustand
   boolean isFlying = false;
   boolean isDragging = false;
   
   ArrayList<PVector> trail=new ArrayList<PVector>();// Liste für die Spur
+ // ArrayList<ArrayList<PVector>> traillist = new ArrayList<ArrayList<PVector>>();
   float trailSize = 5;
 
   Bird(PVector slingshotOrigin) {
@@ -100,28 +101,31 @@ class Bird {
     birdPosition.set(birdStartPosition); // Zurück zur Startposition
     velocity.set(0, 0);                  // Geschwindigkeit zurücksetzen
     isFlying = false;
+    
   }
 
 void drawTrail() {
-
-
+  if (trailAge < 0) {
+    trailAge = 0;
+  }
   for (PVector position : trail) {
-    fill(255, trailAge); // Transparente weiße Punkte
-    
+   
+   // if(trail.size()>2)trail.get(trail.size()-2); //Jedes vorheriges Trail soll durchsichtiger werden
+     fill(255, trailAge); // Transparente weiße Punkte
     noStroke();
     ellipse(position.x*zoom, position.y*zoom, trailSize*zoom, trailSize*zoom);
 
   }
-   
-  trailAge-=1;
-  if (trailAge < 0) {
-    trailAge = 0;
+  //traillist.add(trail);
+  //for (ArrayList<PVector> position2 : traillist) {
+  //  trailAge -=2;
   }
-}
+   
+ 
 
   void handleMousePressed(float mouseX, float mouseY) {
     // Überprüfen, ob der Vogel gedrückt wird
-    if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) < birdSize / 2 && status == 0) {
+    if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) < birdSize / 2 && status == 0 && isFlying != true && dist(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y) < 20) {
       isDragging = true;
     }
   }
@@ -156,6 +160,4 @@ void drawTrail() {
     isDragging = false;
     isFlying = true;
   }
-
-
 }
