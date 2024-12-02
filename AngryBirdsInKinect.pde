@@ -6,7 +6,7 @@ import processing.serial.*;
 SimpleOpenNI kinect;
 
 PImage backgroundImage, rightHandOpen, handOpen, handClosed, slingstand, slingstandfr, birdImage, fox, backr, frontr, glassno, woodno, stoneno;
-ArrayList<PImage> bildliste = new ArrayList<PImage>(); //Unbegrenzte Anzahl Bilder für Editor
+ArrayList<Block> bildliste = new ArrayList<Block>(); //Unbegrenzte Anzahl Bilder für Editor
 ArrayList<PVector> klotzliste = new ArrayList<PVector>(); //Speichert Koordinaten für neue Klötze
 PVector rightHand, leftHand;
 PVector blockpos; //Koordinaten vom Editorblock
@@ -80,38 +80,17 @@ void draw() {
   image(slingstand, centerX-slingX, centerY+slingY, 260/2*zoom, 490/2*zoom);
 
 
-  
-  //if (blockstatus==1) { //Wenn der Block  bewegt wird, wird ein Bild gezeichnet
-  if (klotzliste.size()>0) {
-    //println("Schritt1");
-
-    for (int i = 0; i < bildliste.size(); i++) {
-      for (int j = 0; j < klotzliste.size(); j++) {
-        //image(bildliste.get(bildliste.size()-1), blockpos.x, blockpos.y, 50, 150);
-        mousenew = klotzliste.get(j);
-        // Bild bewegen
-
-        image(bildliste.get(i), mousenew.x, mousenew.y, 50, 150);
-      }
-    }
-      if (gravitystatus==1) { //Wenn der Block schon bewegt wurde, wird Schwerkraft für den Block aktiviert
-    speedY += 0.5;
-    mousenew.y += speedY;
+  for (int i = 0; i < bildliste.size(); i++) {
+    Block currentBlock = bildliste.get(i);
+    currentBlock.blockGravity();
+    currentBlock.draw();  // Block zeichnen
   }
-   // Wenn das Bild den Boden erreicht, stoppe es
-    if (mousenew.y + glassno.height > height+200) {
-      mousenew.y = (height+200) - glassno.height;  // Bild am Boden fixieren
-      speedY *= -0.5;  // Geschwindigkeit umkehren (Bodenabsprung mit Dämpfung)
-    }
-    // println("Schritt 2");
-  }
-  //}
-  //if (blockstatus==1) {
-  //image(glassno, blockpos.x, blockpos.y, 50, 150);
-  //}
+
   //Baumodus
   if (status==1) {
-    image(glassno, 1800, 100, 50, 150); //Blockauswahl
+    image(glassno, 1800, 100, 30, 90); //Blockauswahl
+    image(woodno, 1750, 100, 30, 90); //Blockauswahl
+    image(stoneno, 1700, 100, 30, 90); //Blockauswahl
     textSize(100);
     fill(10);
     text("Mode: Building", 100, 100);
@@ -151,7 +130,7 @@ void draw() {
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
-  handleMousePressedBlock(mouseX, mouseY);
+  handleMousePressedGlassBlock(mouseX, mouseY);
 }
 
 void mouseDragged() {
@@ -165,35 +144,51 @@ void mouseReleased() {
 }
 
 
-void handleMousePressedBlock(float mouseX, float mouseY) {
+void handleMousePressedGlassBlock(float mouseX, float mouseY) {
   // Überprüfen, ob der Block gedrückt wird
   gravitystatus=0;
-  blockpos = new PVector(1800, 100);
-  if (dist(mouseX, mouseY, blockpos.x, blockpos.y) < 15) {
+  //blockpos = new PVector(1800, 100);
+  if (dist(mouseX, mouseY, 1800, 100) < 15) {
     isDraggingBlock = true;
     blockstatus=1;
-    bildliste.add(glassno);
-    println("neuer Klotz");
+    println("zeichne glass");
+    bildliste.add(new Block(glassno, new PVector(blockpos.x, blockpos.y)));
+  }
+  if (dist(mouseX, mouseY, 1750, 100) < 15) {
+    isDraggingBlock = true;
+    blockstatus=1;
+    println("zeichne holz");
+    bildliste.add(new Block(woodno, new PVector(blockpos.x, blockpos.y)));
+  }
+  if (dist(mouseX, mouseY, 1700, 100) < 15) {
+    isDraggingBlock = true;
+    blockstatus=1;
+    println("zeichne stein");
+    bildliste.add(new Block(stoneno, new PVector(blockpos.x, blockpos.y)));
   }
 }
 
 
 void handleMouseDraggedBlock(float mouseX, float mouseY) {
   // Aktualisiere die Blockposition, wenn gezogen wird
-  if (isDraggingBlock == true) {
-    //image(glassno,testblock.x,testblock.y, 50, 150);
+  if (isDraggingBlock) {
     blockpos.set(mouseX, mouseY);
-    image(glassno, blockpos.x, blockpos.y, 50, 150);
-
-    //println("Klotz wird getragen");
+    //image(bildliste.get(bildliste.size()-1), blockpos.x, blockpos.y, 50, 150);
+    Block lastBlock = bildliste.get(bildliste.size()-1);
+    lastBlock.position.set(blockpos.x, blockpos.y);
   }
 }
 
 void handleMouseReleasedBlock() {
-  if (isDraggingBlock==true) {
-
+  if (isDraggingBlock) {
     isDraggingBlock = false; // Beendet das Ziehen
     gravitystatus=1;
+    Block lastBlock = bildliste.get(bildliste.size() - 1);
+    lastBlock.startFalling();  // Block zum Fallen bringen
+
+    klotzliste.add(lastBlock.position);  // Position in die Liste einfügen (falls nötig)
+
+    blockstatus = 0;
     mousenew= new PVector(this.blockpos.x, this.blockpos.y);
     klotzliste.add(mousenew);
 
