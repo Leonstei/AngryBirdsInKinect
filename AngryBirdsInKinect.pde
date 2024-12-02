@@ -195,7 +195,7 @@ void onLostHand(SimpleOpenNI curContext, int handId) {
 }
 
 void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
-  println("Geste erkannt: " + gestureType + ", Position: " + pos);
+  //println("Geste erkannt: " + gestureType + ", Position: " + pos);
   if(gestureType == 1){
     println(SimpleOpenNI.GESTURE_CLICK);
   }
