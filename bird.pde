@@ -87,8 +87,30 @@ class Bird {
         velocity.y = 0;
         velocity.x = 0;
         isFlying = false; // Flug beenden
+      } else if (birdPosition.y < 10) {
+        birdPosition.y = 15;
+        velocity.y = 0;
+        velocity.x = 0;
+        isAbility = false; // Flug beenden
+        isFlying = true;
+        isDirectionSet = false;
+      } else if (birdPosition.x > 1910) {
+        birdPosition.x = 1900;
+        velocity.y = 0;
+        velocity.x = 0;
+        isAbility = false; // Flug beenden
+        isFlying = true;
+        isDirectionSet = false;
+      } else if (birdPosition.x < 40) {
+        birdPosition.x = 40;
+        velocity.y = 0;
+        velocity.x = 0;
+        isAbility = false; // Flug beenden
+        isFlying = true;
+        isDirectionSet = false;
       }
     }
+
     if (isAbility && isFlying) {
       if (!isDirectionSet) {
         // Berechne den Vektor von der aktuellen Position zum Mauszeiger
@@ -98,7 +120,7 @@ class Bird {
       }
 
       // Geschwindigkeit in Richtung des Mauszeigers anwenden
-      float acceleration = 10; // Geschwindigkeit, mit der der Vogel sich in Richtung des Mauszeigers bewegt
+      float acceleration = 100; // Geschwindigkeit, mit der der Vogel sich in Richtung des Mauszeigers bewegt
       velocity.x = direction.x*acceleration;
       velocity.y = direction.y*acceleration;
 
@@ -115,13 +137,34 @@ class Bird {
 
       // Füge den neuen Punkt zur Spur hinzu
       trail.add(birdPosition.copy());
-      
+
       if (birdPosition.y > height - birdSize / 2 || birdPosition.y > 980) {
         birdPosition.y = 980;
         velocity.y = 0;
         velocity.x = 0;
         isAbility = false; // Flug beenden
         isFlying = false;
+        isDirectionSet = false;
+      } else if (birdPosition.y < 10) {
+        birdPosition.y = 15;
+        velocity.y = 0;
+        velocity.x = 0;
+        isAbility = false; // Flug beenden
+        isFlying = true;
+        isDirectionSet = false;
+      } else if (birdPosition.x > 1910) {
+        birdPosition.x = 1900;
+        velocity.y = 0;
+        velocity.x = 0;
+        isAbility = false; // Flug beenden
+        isFlying = true;
+        isDirectionSet = false;
+      } else if (birdPosition.x < 40) {
+        birdPosition.x = 40;
+        velocity.y = 0;
+        velocity.x = 0;
+        isAbility = false; // Flug beenden
+        isFlying = true;
         isDirectionSet = false;
       }
     }
