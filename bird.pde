@@ -21,6 +21,7 @@ class Bird {
   boolean isDragging = false;
   boolean isAbility = false;
   boolean isDirectionSet = false;
+  boolean hitwall = false;
 
   ArrayList<PVector> trail=new ArrayList<PVector>();// Liste für die Spur
   // ArrayList<ArrayList<PVector>> traillist = new ArrayList<ArrayList<PVector>>();
@@ -87,6 +88,7 @@ class Bird {
         velocity.y = 0;
         velocity.x = 0;
         isFlying = false; // Flug beenden
+        hitwall = true;
       } else if (birdPosition.y < 10) {
         birdPosition.y = 15;
         velocity.y = 0;
@@ -94,6 +96,7 @@ class Bird {
         isAbility = false; // Flug beenden
         isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       } else if (birdPosition.x > 1910) {
         birdPosition.x = 1900;
         velocity.y = 0;
@@ -101,6 +104,7 @@ class Bird {
         isAbility = false; // Flug beenden
         isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       } else if (birdPosition.x < 40) {
         birdPosition.x = 40;
         velocity.y = 0;
@@ -108,6 +112,7 @@ class Bird {
         isAbility = false; // Flug beenden
         isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       }
     }
 
@@ -143,8 +148,9 @@ class Bird {
         velocity.y = 0;
         velocity.x = 0;
         isAbility = false; // Flug beenden
-        isFlying = false;
+        isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       } else if (birdPosition.y < 10) {
         birdPosition.y = 15;
         velocity.y = 0;
@@ -152,6 +158,7 @@ class Bird {
         isAbility = false; // Flug beenden
         isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       } else if (birdPosition.x > 1910) {
         birdPosition.x = 1900;
         velocity.y = 0;
@@ -159,6 +166,7 @@ class Bird {
         isAbility = false; // Flug beenden
         isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       } else if (birdPosition.x < 40) {
         birdPosition.x = 40;
         velocity.y = 0;
@@ -166,6 +174,7 @@ class Bird {
         isAbility = false; // Flug beenden
         isFlying = true;
         isDirectionSet = false;
+        hitwall = true;
       }
     }
 
@@ -184,6 +193,7 @@ class Bird {
     isFlying = false;
     isAbility = false;
     isDirectionSet = false;
+    hitwall = false;
   }
 
   void drawTrail() {
@@ -211,7 +221,7 @@ class Bird {
       isDragging = true;
     }
     // Hier wird genau das Gegenteil geprüft, um die Fähigkeit zu aktivieren.
-    if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) > 20 && status == 0 && isFlying == true && dist(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y) > 20) {
+    if (dist(mouseX, mouseY, birdPosition.x, birdPosition.y) > 20 && status == 0 && isFlying == true && dist(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y) > 20 && hitwall == false) {
       isAbility= true;
     }
   }
