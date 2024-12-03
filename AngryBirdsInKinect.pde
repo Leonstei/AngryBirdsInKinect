@@ -147,24 +147,23 @@ void mouseReleased() {
 void handleMousePressedGlassBlock(float mouseX, float mouseY) {
   // Überprüfen, ob der Block gedrückt wird
   gravitystatus=0;
-  //blockpos = new PVector(1800, 100);
   if (dist(mouseX, mouseY, 1800, 100) < 15) {
     isDraggingBlock = true;
     blockstatus=1;
     println("zeichne glass");
-    bildliste.add(new Block(glassno, new PVector(blockpos.x, blockpos.y)));
+    bildliste.add(new Block(glassno, new PVector(blockpos.x, blockpos.y), new PVector(50,150)));
   }
   if (dist(mouseX, mouseY, 1750, 100) < 15) {
     isDraggingBlock = true;
     blockstatus=1;
     println("zeichne holz");
-    bildliste.add(new Block(woodno, new PVector(blockpos.x, blockpos.y)));
+    bildliste.add(new Block(woodno, new PVector(blockpos.x, blockpos.y),new PVector(50,150)));
   }
   if (dist(mouseX, mouseY, 1700, 100) < 15) {
     isDraggingBlock = true;
     blockstatus=1;
     println("zeichne stein");
-    bildliste.add(new Block(stoneno, new PVector(blockpos.x, blockpos.y)));
+    bildliste.add(new Block(stoneno, new PVector(blockpos.x, blockpos.y),new PVector(50,150)));
   }
 }
 
