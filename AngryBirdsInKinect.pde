@@ -11,7 +11,9 @@ Tower tower; // Turm-Objekt
 Enemy enemy; 
 
 
-PImage backgroundImage, rightHandOpen, handOpen, handClosed, slingshotImage, birdImage, enemySprite;
+
+
+PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingshotImage, birdImage;
 
 PVector rightHand, leftHand;
 int slingshotSize = 200;
@@ -26,15 +28,19 @@ void setup() {
   kinect.enableUser();
   kinect.setMirror(true);
 
+
   size(1840, 980);
   float groundHeight = height - 10; // Höhe des Bodens
+
 
   // Hände initialisieren
   rightHand = new PVector(0, 0);
   leftHand = new PVector(0, 0);
 
   // Bilder laden
+
   backgroundImage = loadImage("background.png");
+
   rightHandOpen = loadImage("rightHandOpen.png");
   handClosed = loadImage("leftHandClosed.png");
   handOpen = loadImage("leftHandOpen.png");
@@ -160,6 +166,7 @@ void drawJoint(int userId, int jointId) {
   convertedJoint.x = map(convertedJoint.x, 0, 640, -420, 2160);
   convertedJoint.y = map(convertedJoint.y, 0, 480, -240, 1680);
 
+
   if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
     rightHand.set(convertedJoint.x, convertedJoint.y);
   } else if (jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
@@ -181,6 +188,7 @@ void drawJoint(int userId, int jointId) {
   }
 
   // Hand-Symbol zeichnen
+
   if (count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
     image(handClosed, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
   } else if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
