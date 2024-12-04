@@ -1,3 +1,6 @@
+import org.jbox2d.dynamics.*;
+import org.jbox2d.common.*;
+import org.jbox2d.collision.shapes.*;
 
 class Bird {
   Box2DProcessing box2d;
@@ -29,8 +32,8 @@ class Bird {
 
     FixtureDef fd = new FixtureDef();
     fd.shape = cs;
-    fd.density = 3;
-    fd.friction = 0.1;
+    fd.density = 1;
+    fd.friction = 0.5;
     fd.restitution = 0.8;
 
     body = box2d.createBody(bd);
@@ -40,10 +43,10 @@ class Bird {
     body.setType(BodyType.STATIC);
   }
 
-    PVector getPixelPosition() {
+  PVector getPixelPosition() {
     Vec2 pos = box2d.getBodyPixelCoord(body);
     return new PVector(pos.x, pos.y);
-}
+  }
 
   void handleMousePressed(float mouseX, float mouseY) {
     // Überprüfen, ob die Maus nah genug ist, um den Vogel zu greifen
@@ -68,14 +71,13 @@ class Bird {
 
   void handleMouseReleased() {
     if (isDragging) {
-        // Berechne die Freigabegeschwindigkeit basierend auf der Dehnung
-        float power = 5.0f; // Verstärke die Kraft (Skalierungsfaktor)
-        Vec2 releaseVelocity = new Vec2(-stretch.x * power, -stretch.y * power);
-        body.setType(BodyType.DYNAMIC); // Der Vogel wird fliegbar gemacht
-        body.setLinearVelocity(box2d.vectorPixelsToWorld(releaseVelocity));
-        isFlying = true;
-        isDragging = false;
-        stretch.set(0, 0); // Setze die Dehnung zurück
+      // Berechne die Freigabegeschwindigkeit basierend auf der Dehnung
+      Vec2 releaseVelocity = new Vec2(-stretch.x * 0.1f, -stretch.y * 0.1f);
+      body.setType(BodyType.DYNAMIC); // Der Vogel wird fliegbar gemacht
+      body.setLinearVelocity(box2d.vectorPixelsToWorld(releaseVelocity));
+      isFlying = true;
+      isDragging = false;
+      stretch.set(0, 0); // Setze die Dehnung zurück
     }
   }
 
@@ -98,17 +100,10 @@ class Bird {
       stroke(0);
       line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
     }
-    
-
 
     pushMatrix();
     translate(birdPosition.x, birdPosition.y);
     image(birdImage, -radius, -radius, radius * 2, radius * 2);
     popMatrix();
   }
-  
-
-      float getRadius(){
-        return this.radius;
-    }
 }
