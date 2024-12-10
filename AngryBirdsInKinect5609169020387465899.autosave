@@ -12,8 +12,8 @@ Enemy enemy;
 
 
 
-PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite;
-HashMap<Integer, PVector> trackedHands = new HashMap<Integer, PVector>();
+
+PImage backgroundImage,rightHandOpen, handOpen, handClosed, slingshotImage, birdImage;
 
 PVector rightHand, leftHand;
 int slingshotSize = 200;
@@ -22,12 +22,11 @@ Bird bird;
 float groundHeight = height - 10;
 
 void setup() {
-  //// Kinect-Einstellungen
-  //kinect = new SimpleOpenNI(this);
-  //kinect.enableDepth();
-  //kinect.enableUser();
-  //kinect.setMirror(true);
-  setupKinect();
+  // Kinect-Einstellungen
+  kinect = new SimpleOpenNI(this);
+  kinect.enableDepth();
+  kinect.enableUser();
+  kinect.setMirror(true);
 
 
   size(1840, 980);
@@ -44,10 +43,10 @@ void setup() {
 
   rightHandOpen = loadImage("rightHandOpen.png");
   handClosed = loadImage("leftHandClosed.png");
-  leftHandOpen = loadImage("leftHandOpen.png");
+  handOpen = loadImage("leftHandOpen.png");
   slingshotImage = loadImage("slingshotfin.png");
   birdImage = loadImage("grover1.png");
-   enemySprite = loadImage("enemy_sprite.png");
+  // enemySprite = loadImage("enemy_sprite.png");
 
 
   // Hintergrundbildgröße anpassen
@@ -85,7 +84,7 @@ void setup() {
     enemy.addEnemy(900, height - 350, 20); // Position (600, Höhe - 100), Radius 20
     enemy.addEnemy(500, height - 50, 50); // Position (600, Höhe - 100), Radius 20
 
-      enemy.enemyImage = enemySprite;
+     // enemy.enemyImage = enemySprite;
 
 }
 
@@ -117,17 +116,16 @@ void draw() {
 
 
   // Kinect-Benutzer verfolgen
-  //IntVector userList = new IntVector();
-  //kinect.getUsers(userList);
+  IntVector userList = new IntVector();
+  kinect.getUsers(userList);
 
-  //if (userList.size() > 0) {
-  //  int userId = userList.get(0);
+  if (userList.size() > 0) {
+    int userId = userList.get(0);
 
-  //  if (kinect.isTrackingSkeleton(userId)) {
-  //    drawSkeleton(userId);
-  //  }
-  //}
-  drawHand();
+    if (kinect.isTrackingSkeleton(userId)) {
+      drawSkeleton(userId);
+    }
+  }
 }
 
 void createGround() {
@@ -196,7 +194,7 @@ void drawJoint(int userId, int jointId) {
   } else if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
     image(rightHandOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
   } else {
-    image(leftHandOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
+    image(handOpen, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
   }
 }
 

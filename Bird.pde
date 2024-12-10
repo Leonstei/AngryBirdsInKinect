@@ -65,6 +65,14 @@ class Bird {
       birdPosition.set(PVector.add(slingshotOrigin, stretch));
     }
   }
+  void startDragging(PVector handPosition) {
+    isDragging = true;
+    stretch = PVector.sub(new PVector(handPosition.x,handPosition.y), slingshotOrigin);
+      if (stretch.mag() > maxStretch) {
+        stretch.setMag(maxStretch); // Begrenze die Dehnung
+      }
+    birdPosition.set(handPosition.x,handPosition.y);
+  }
 
   void handleMouseReleased() {
     if (isDragging) {
@@ -77,6 +85,14 @@ class Bird {
         isDragging = false;
         stretch.set(0, 0); // Setze die Dehnung zurück
     }
+  }
+  void releaseWithPower(float power) {
+    Vec2 releaseVelocity = new Vec2(-stretch.x * power, -stretch.y * power);
+    body.setType(BodyType.DYNAMIC); // Der Vogel wird fliegbar gemacht
+    body.setLinearVelocity(box2d.vectorPixelsToWorld(releaseVelocity));
+    isDragging = false;
+    isFlying = true;
+    stretch.set(0, 0);
   }
 
   void resetBird() {
