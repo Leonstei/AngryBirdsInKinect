@@ -70,18 +70,18 @@ void setup() {
 
   // Haus Obejkt initialisieren
   tower.buildSimpleHouse(new PVector(900, height - 50), 40, 20); 
-    tower.buildSimpleHouse(new PVector(900, height - 150), 40, 20); 
-    tower.buildSimpleHouse(new PVector(900, height - 300), 40, 20); 
-    tower.buildSimpleHouse(new PVector(900, height - 450), 40, 20); 
+  tower.buildSimpleHouse(new PVector(900, height - 150), 40, 20); 
+  tower.buildSimpleHouse(new PVector(900, height - 300), 40, 20); 
+  tower.buildSimpleHouse(new PVector(900, height - 450), 40, 20); 
 
   // Gegner-Objekt initialisieren
   enemy = new Enemy(box2d);
 
   // Gegner hinzufügen
-    enemy.addEnemy(900, height - 55, 30); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(900, height - 200, 30); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(900, height - 330, 30); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(900, height - 460, 50); // Position (600, Höhe - 100), Radius 20
+  enemy.addEnemy(900, height - 55, 30); // Position (600, Höhe - 100), Radius 20
+  enemy.addEnemy(900, height - 200, 30); // Position (600, Höhe - 100), Radius 20
+  enemy.addEnemy(900, height - 330, 30); // Position (600, Höhe - 100), Radius 20
+  enemy.addEnemy(900, height - 460, 50); // Position (600, Höhe - 100), Radius 20
 
   //Assets zu Gegner und Türmen hinzufügen
   enemy.enemyImage = enemySprite;
@@ -189,15 +189,16 @@ void mousePressed() {
 }
 
 void mouseDragged() {
-  bird.handleMouseDragged(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
+  bird.startDragging(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
 }
 
 void mouseReleased() {
-  bird.handleMouseReleased(); // Maus-Interaktion an Vogel delegieren
+  bird.releaseWithPower(); // Maus-Interaktion an Vogel delegieren
 }
 
 void keyPressed() {
   if (!bird.isFlying) {
+    println("reset");
     bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
   }
 }

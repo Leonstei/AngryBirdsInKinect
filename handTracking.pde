@@ -27,10 +27,11 @@ void drawHand(){
   }
   
   if (count > 20 && handPos.x < width/2) {
-    bird.startDragging(handPos); // Wenn Hände sich senken, wird der Vogel losgelassen
+    bird.isDragging = true;
+    bird.startDragging(handPos.x,handPos.y); // Wenn Hände sich senken, wird der Vogel losgelassen
     if ( rightHand.y < 50 ) {
       count = 0;
-      bird.releaseWithPower(1.25);
+      bird.releaseWithPower();
     }
   }
   if(trackedHands.size() == 1){

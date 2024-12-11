@@ -44,7 +44,7 @@ class Enemy {
         radii.add(radius);
         alive.add(true);
 
-        println("Enemy added: " + enemyBody);
+        //println("Enemy added: " + enemyBody);
     }
 
     void display() {
@@ -74,7 +74,7 @@ class Enemy {
     }
 
     void checkForBirdCollision(PVector birdPosition, float birdRadius) {
-        println("Checking collisions...");
+        //println("Checking collisions...");
         for (int i = 0; i < enemies.size(); i++) {
             if (!alive.get(i)) continue;
 
@@ -85,11 +85,11 @@ class Enemy {
             float distance = dist(enemyPos.x, enemyPos.y, birdPosition.x, birdPosition.y);
 
             // Debugging-Logs
-            println("Enemy " + i + " position: " + enemyPos + ", Bird position: " + birdPosition);
-            println("Distance to Enemy " + i + ": " + distance + ", Combined Radius: " + (enemyRadius + birdRadius));
+            //println("Enemy " + i + " position: " + enemyPos + ", Bird position: " + birdPosition);
+            //println("Distance to Enemy " + i + ": " + distance + ", Combined Radius: " + (enemyRadius + birdRadius));
 
             if (distance <= enemyRadius + birdRadius) {
-                println("Enemy " + i + " was hit by the bird!");
+                //println("Enemy " + i + " was hit by the bird!");
                 killEnemy(i);
             }
         }
