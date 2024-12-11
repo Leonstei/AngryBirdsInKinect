@@ -7,12 +7,12 @@ import org.jbox2d.dynamics.*;
 
 SimpleOpenNI kinect;
 Box2DProcessing box2d;
-Tower tower; // Turm-Objekt
+TowerBlock tower; // Turm-Objekt
 Enemy enemy; 
 
 
 
-PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite;
+PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage;
 HashMap<Integer, PVector> trackedHands = new HashMap<Integer, PVector>();
 
 PVector rightHand, leftHand;
@@ -29,7 +29,7 @@ void setup() {
   //kinect.setMirror(true);
   setupKinect();
 
-
+  //Fenster Setup
   size(1840, 980);
   float groundHeight = height - 10; // Höhe des Bodens
 
@@ -39,15 +39,14 @@ void setup() {
   leftHand = new PVector(0, 0);
 
   // Bilder laden
-
   backgroundImage = loadImage("background.png");
-
   rightHandOpen = loadImage("rightHandOpen.png");
   handClosed = loadImage("leftHandClosed.png");
   leftHandOpen = loadImage("leftHandOpen.png");
   slingshotImage = loadImage("slingshotfin.png");
   birdImage = loadImage("grover1.png");
-   enemySprite = loadImage("enemy_sprite.png");
+  enemySprite = loadImage("enemy_sprite.png");
+  woodImage = loadImage("wood.png"); // Bild für die Blöcke laden
 
 
   // Hintergrundbildgröße anpassen
@@ -58,7 +57,7 @@ void setup() {
  // Box2D initialisieren
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
-  box2d.setGravity(0, -10);
+  box2d.setGravity(0, -25);
 
   // Vogel-Objekt initialisieren
   bird = new Bird(box2d, new PVector(200, height - 150));
@@ -67,26 +66,26 @@ void setup() {
   createGround();
 
   // Tower-Objekt initialisieren
-  tower = new Tower(box2d);
+  tower = new TowerBlock(box2d);
 
   // Haus Obejkt initialisieren
   tower.buildSimpleHouse(new PVector(900, height - 50), 40, 20); 
     tower.buildSimpleHouse(new PVector(900, height - 150), 40, 20); 
     tower.buildSimpleHouse(new PVector(900, height - 300), 40, 20); 
+    tower.buildSimpleHouse(new PVector(900, height - 450), 40, 20); 
 
-  
   // Gegner-Objekt initialisieren
   enemy = new Enemy(box2d);
 
   // Gegner hinzufügen
-  //enemy.addEnemy(900, height - 60, 20); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(900, height - 55, 20); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(900, height - 215, 20); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(900, height - 350, 20); // Position (600, Höhe - 100), Radius 20
-    enemy.addEnemy(500, height - 50, 50); // Position (600, Höhe - 100), Radius 20
+    enemy.addEnemy(900, height - 55, 30); // Position (600, Höhe - 100), Radius 20
+    enemy.addEnemy(900, height - 200, 30); // Position (600, Höhe - 100), Radius 20
+    enemy.addEnemy(900, height - 330, 30); // Position (600, Höhe - 100), Radius 20
+    enemy.addEnemy(900, height - 460, 50); // Position (600, Höhe - 100), Radius 20
 
-      enemy.enemyImage = enemySprite;
-
+  //Assets zu Gegner und Türmen hinzufügen
+  enemy.enemyImage = enemySprite;
+  tower.blockImage = woodImage;
 }
 
 void draw() {
@@ -106,28 +105,14 @@ void draw() {
   // Turm anzeigen
   tower.display();
 
- PVector birdPos = bird.getPixelPosition();
+    PVector birdPos = bird.getPixelPosition();
     float birdRadius = bird.getRadius();
-
-    //println("Bird position in draw: " + birdPos);
 
     enemy.display();
     enemy.checkForBirdCollision(birdPos, birdRadius);
     enemy.checkForImpact(tower.getBlocks());
 
-
-  // Kinect-Benutzer verfolgen
-  //IntVector userList = new IntVector();
-  //kinect.getUsers(userList);
-
-  //if (userList.size() > 0) {
-  //  int userId = userList.get(0);
-
-  //  if (kinect.isTrackingSkeleton(userId)) {
-  //    drawSkeleton(userId);
-  //  }
-  //}
-  drawHand();
+    drawHand();
 }
 
 void createGround() {
@@ -190,7 +175,6 @@ void drawJoint(int userId, int jointId) {
   }
 
   // Hand-Symbol zeichnen
-
   if (count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
     image(handClosed, convertedJoint.x - 50, convertedJoint.y - 50, 100, 100);
   } else if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {

@@ -7,14 +7,18 @@ class Enemy {
     ArrayList<Body> enemies; // Liste der Gegnerkörper
     ArrayList<Float> radii;  // Liste der Radien der Gegner
     ArrayList<Boolean> alive; // Liste, ob ein Gegner noch lebt (true = lebt)
-    float impactThreshold = 6.5f; // Schwelle für zu starken Treffer
-    PImage enemyImage;
+    PImage enemyImage; // Bild für die Gegner
+    float impactThreshold = 5.5f; // Schwelle für zu starken Treffer
 
     Enemy(Box2DProcessing box2d) {
         this.box2d = box2d;
-        this.enemies = new ArrayList<Body>();
-        this.radii = new ArrayList<Float>();
-        this.alive = new ArrayList<Boolean>();
+        this.enemies = new ArrayList<>();
+        this.radii = new ArrayList<>();
+        this.alive = new ArrayList<>();
+    }
+
+    void setEnemyImage(PImage img) {
+        this.enemyImage = img;
     }
 
     void addEnemy(float x, float y, float radius) {
@@ -29,8 +33,8 @@ class Enemy {
 
         FixtureDef fd = new FixtureDef();
         fd.shape = cs;
-        fd.density = 3.0f; 
-        fd.friction = 0.5f; 
+        fd.density = 4.0f; 
+        fd.friction = 0.7f; 
         fd.restitution = 0.2f;
 
         Body enemyBody = box2d.createBody(bd);
@@ -44,8 +48,6 @@ class Enemy {
     }
 
     void display() {
-        fill(255, 0, 0);
-        stroke(0);
         for (int i = 0; i < enemies.size(); i++) {
             if (!alive.get(i)) continue;
 
@@ -58,14 +60,16 @@ class Enemy {
             pushMatrix();
             translate(pos.x, pos.y);
             rotate(-angle);
-            ellipseMode(CENTER);
-            ellipse(0, 0, radius * 2, radius * 2);
-            popMatrix();
 
-            // Debug: Kollisionsbereich anzeigen
-            noFill();
-            stroke(0, 255, 0);
-            ellipse(pos.x, pos.y, radius * 2, radius * 2);
+            if (enemyImage != null) {
+                image(enemyImage, -radius, -radius, radius * 2, radius * 2); // Zeichne das Bild
+            } else {
+                fill(255, 0, 0);
+                ellipseMode(CENTER);
+                ellipse(0, 0, radius * 2, radius * 2); // Zeichne den Kreis, wenn kein Bild gesetzt ist
+            }
+
+            popMatrix();
         }
     }
 

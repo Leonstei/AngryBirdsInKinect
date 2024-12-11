@@ -29,9 +29,9 @@ class Bird {
 
     FixtureDef fd = new FixtureDef();
     fd.shape = cs;
-    fd.density = 3;
+    fd.density = 5;
     fd.friction = 0.1;
-    fd.restitution = 0.8;
+    fd.restitution = 0.9;
 
     body = box2d.createBody(bd);
     body.createFixture(fd);
@@ -46,25 +46,26 @@ class Bird {
 }
 
   void handleMousePressed(float mouseX, float mouseY) {
-    // Überprüfen, ob die Maus nah genug ist, um den Vogel zu greifen
     PVector pos = getPixelPosition();
     if (dist(mouseX, mouseY, pos.x, pos.y) < radius) {
       isDragging = true;
-      body.setType(BodyType.STATIC); // Der Vogel bleibt statisch während des Ziehens
+      body.setLinearVelocity(new Vec2(0, 0)); // Stop any movement
     }
   }
 
-  void handleMouseDragged(float mouseX, float mouseY) {
+ void handleMouseDragged(float mouseX, float mouseY) {
     if (isDragging) {
-      // Berechne die Stretch basierend auf der Mausposition
-      stretch = PVector.sub(new PVector(mouseX, mouseY), slingshotOrigin);
+      // Calculate the drag stretch relative to the slingshot origin
+      PVector stretch = PVector.sub(new PVector(mouseX, mouseY), slingshotOrigin);
       if (stretch.mag() > maxStretch) {
-        stretch.setMag(maxStretch); // Begrenze die Dehnung
+        stretch.setMag(maxStretch); // Limit the stretch distance
       }
-      // Aktualisiere die Vogelposition basierend auf der Stretch
-      birdPosition.set(PVector.add(slingshotOrigin, stretch));
+      // Update the bird's position
+      PVector newPosition = PVector.add(slingshotOrigin, stretch);
+      body.setTransform(box2d.coordPixelsToWorld(newPosition.x, newPosition.y), 0);
     }
   }
+  
   void startDragging(PVector handPosition) {
     isDragging = true;
     stretch = PVector.sub(new PVector(handPosition.x,handPosition.y), slingshotOrigin);
@@ -76,16 +77,25 @@ class Bird {
 
   void handleMouseReleased() {
     if (isDragging) {
-        // Berechne die Freigabegeschwindigkeit basierend auf der Dehnung
-        float power = 5.0f; // Verstärke die Kraft (Skalierungsfaktor)
-        Vec2 releaseVelocity = new Vec2(-stretch.x * power, -stretch.y * power);
-        body.setType(BodyType.DYNAMIC); // Der Vogel wird fliegbar gemacht
-        body.setLinearVelocity(box2d.vectorPixelsToWorld(releaseVelocity));
-        isFlying = true;
         isDragging = false;
-        stretch.set(0, 0); // Setze die Dehnung zurück
+
+        // Calculate the release velocity based on stretch
+        float power = 7.5f; // Strength multiplier for release
+        PVector stretch = PVector.sub(getPixelPosition(), slingshotOrigin);
+        Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(-stretch.x * power, -stretch.y * power));
+
+        // Set body type to DYNAMIC so it can be affected by physics
+        body.setType(BodyType.DYNAMIC);
+
+        // Apply the calculated release velocity to the bird
+        body.setLinearVelocity(releaseVelocity);
+
+        // Transition state to flying
+        isFlying = true;
     }
-  }
+}
+
+  
   void releaseWithPower(float power) {
     Vec2 releaseVelocity = new Vec2(-stretch.x * power, -stretch.y * power);
     body.setType(BodyType.DYNAMIC); // Der Vogel wird fliegbar gemacht
@@ -96,31 +106,28 @@ class Bird {
   }
 
   void resetBird() {
-    // Setze den Vogel auf die Schleuderposition zurück
+    // Reset the bird to its initial position
     body.setTransform(box2d.coordPixelsToWorld(slingshotOrigin.x, slingshotOrigin.y), 0);
     body.setLinearVelocity(new Vec2(0, 0));
     body.setAngularVelocity(0);
-    body.setType(BodyType.STATIC); // Fixiere den Vogel wieder
     isFlying = false;
     isDragging = false;
   }
+  
 
-  void display() {
-    // Zeichne den Vogel an seiner aktuellen Position
-    birdPosition = getPixelPosition();
 
-    // Zeichne das Schleuderband, wenn der Vogel gezogen wird
-    if (isDragging) {
-      stroke(0);
-      line(slingshotOrigin.x, slingshotOrigin.y, birdPosition.x, birdPosition.y);
-    }
-    
-
+ void display() {
+    PVector pos = getPixelPosition();
 
     pushMatrix();
-    translate(birdPosition.x, birdPosition.y);
+    translate(pos.x, pos.y);
     image(birdImage, -radius, -radius, radius * 2, radius * 2);
     popMatrix();
+
+    if (isDragging) {
+      stroke(0);
+      line(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
+    }
   }
   
 
