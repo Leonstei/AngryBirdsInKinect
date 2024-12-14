@@ -7,7 +7,7 @@ class Bird {
   PVector stretch; // Stretch-Vektor für die Schleuder
   float radius = 25;
   float maxStretch = 100; // Maximale Stretch-Distanz
-  float lifeTime = 10;
+  float lifeTime = 20;
   boolean isFlying = false; // Gibt an, ob der Vogel fliegt
   boolean isDragging = false; // Gibt an, ob der Vogel gezogen wird
   ArrayList<PVector> trail=new ArrayList<PVector>();
@@ -49,7 +49,7 @@ class Bird {
 
   void drawTrail() {
     float trailSize = radius/2;
-    fill(255, 0, 0, 150); // Transparente rote Punkte
+    fill(255, 150); // Transparente rote Punkte
     noStroke();
     for (PVector position : trail) {
       ellipse(position.x, position.y, trailSize, trailSize);
@@ -58,7 +58,7 @@ class Bird {
 
   void handleMousePressed(float mouseX, float mouseY) {
     PVector pos = getPixelPosition();
-    if (dist(mouseX, mouseY, pos.x, pos.y) < radius) {
+    if (dist(mouseX, mouseY, pos.x, pos.y) < radius && !isFlying) {
       isDragging = true;
       body.setLinearVelocity(new Vec2(0, 0)); // Stop any movement
     }
@@ -102,12 +102,13 @@ class Bird {
 
   void resetBird() {
     // Reset the bird to its initial position
+    body.setType(BodyType.STATIC);
     body.setTransform(box2d.coordPixelsToWorld(slingshotOrigin.x, slingshotOrigin.y), 0);
     body.setLinearVelocity(new Vec2(0, 0));
     body.setAngularVelocity(0);
     isFlying = false;
     isDragging = false;
-    lifeTime = 10;
+    lifeTime = 20;
   }
 
 
@@ -116,7 +117,7 @@ class Bird {
     drawTrail();
     if(isFlying){
       lifeTime -= 0.05;
-      println(lifeTime);
+      //println(lifeTime);
     }
     if(lifeTime <= 0){
       body.setLinearVelocity(new Vec2(0, 0));
@@ -126,18 +127,31 @@ class Bird {
       return;
     }
     PVector pos = getPixelPosition();
-    trail.add(pos);
-
-    pushMatrix();
-    translate(pos.x, pos.y);
-    image(birdImage, -radius, -radius, radius * 2, radius * 2);
-    popMatrix();
+    
+    if(!isDragging){
+      trail.add(pos);
+      pushMatrix();
+      translate(pos.x, pos.y);
+      image(birdImage, -radius, -radius, radius * 2, radius * 2);
+      popMatrix();
+    }
 
     if (isDragging) {
       stroke(0);
-      line(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
+      float angle = atan2(slingshotOrigin.y - pos.y, slingshotOrigin.x - pos.x);
+      float distance = dist(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
+      println(angle);
+      pushMatrix();
+      translate(pos.x, pos.y); // Ursprung des Gummibands
+      rotate(angle); // Drehe das Bild entsprechend dem Winkel
+      image(rubberBandBackImage, 0-getRadius(), rubberBandBackImage.height-1 , distance, rubberBandBackImage.height);
+      image(birdImage, -radius, -radius, radius * 2, radius * 2);
+      image(rubberBandImage, 0-getRadius(), 0, distance, getRadius()*0.7);
+      popMatrix();
+      //line(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
     }
   }
+
 
 
   float getRadius() {

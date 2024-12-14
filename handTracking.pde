@@ -22,13 +22,13 @@ void drawHand(){
 
   decideIfRightOrLeft(handPos);
   
-  if (dist(handPos.x, handPos.y, bird.birdPosition.x, bird.birdPosition.y) < 30) {
+  if (dist(handPos.x, handPos.y, bird.birdPosition.x, bird.birdPosition.y) < 30 && !bird.isFlying) {
     count++;
   }
   
-  if (count > 20 && handPos.x < width/2) {
+  if (count > 20 && dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100) {
     bird.isDragging = true;
-    bird.startDragging(handPos.x,handPos.y); // Wenn Hände sich senken, wird der Vogel losgelassen
+    bird.startDragging(leftHand.x,leftHand.y); // Wenn Hände sich senken, wird der Vogel losgelassen
     if ( rightHand.y < 50 ) {
       count = 0;
       bird.releaseWithPower();
@@ -62,12 +62,15 @@ void drawLeftHand(){
    dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100 && 
    dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) >100
    ){
-     leftHand.set(handPos.x, handPos.y);
+     smoothHandWithSpeed(handPos,leftHand,leftHand);
+     println(leftHand);
+     //leftHand.set(handPos.x, handPos.y);
    }else if(
      dist(handPos.x, handPos.y, rightHand.x, rightHand.y) < 100 && 
      dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) > 100
    ){
-     rightHand.set(handPos.x, handPos.y);
+     smoothHandWithSpeed(handPos,rightHand,rightHand);
+     //rightHand.set(handPos.x, handPos.y);
    }else{
      if (handPos.x >= width / 2) {
       rightHand.set(handPos.x, handPos.y);
@@ -76,6 +79,20 @@ void drawLeftHand(){
     }
    }
  }
+ 
+ void smoothHandWithSpeed(PVector newPos, PVector oldPos, PVector smoothedPos) {
+  float speed = dist(newPos.x, newPos.y, oldPos.x, oldPos.y);
+  float dynamicAlpha = constrain(speed / 50.0, 0.05, 0.95); // Dynamischer Glättungsfaktor
+  smoothedPos.x = dynamicAlpha * newPos.x + (1 - dynamicAlpha) * smoothedPos.x;
+  smoothedPos.y = dynamicAlpha * newPos.y + (1 - dynamicAlpha) * smoothedPos.y;
+}
+float tolerance = 10; // Mindeständerung, um die Position zu aktualisieren
+
+void updateHandPositionWithDeadband(PVector newPos, PVector oldPos, PVector smoothedPos) {
+  if (dist(newPos.x, newPos.y, oldPos.x, oldPos.y) > tolerance) {
+    smoothedPos.set(newPos);
+  }
+}
  
  //if(
  //  leftHand.x != 0 && leftHand.y != 0 &&

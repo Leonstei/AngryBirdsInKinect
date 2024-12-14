@@ -12,7 +12,8 @@ Enemy enemy;
 
 
 
-PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage;
+PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage, 
+rubberBandImage, rubberBandBackImage;
 HashMap<Integer, PVector> trackedHands = new HashMap<Integer, PVector>();
 
 PVector rightHand, leftHand;
@@ -47,7 +48,8 @@ void setup() {
   birdImage = loadImage("grover1.png");
   enemySprite = loadImage("enemy_sprite.png");
   woodImage = loadImage("wood.png"); // Bild für die Blöcke laden
-
+  rubberBandImage = loadImage("rubberbandfront 1.png");
+  rubberBandBackImage = loadImage("rubberbandback.png");
 
   // Hintergrundbildgröße anpassen
   if (backgroundImage.width != width || backgroundImage.height != height) {
@@ -60,7 +62,7 @@ void setup() {
   box2d.setGravity(0, -25);
 
   // Vogel-Objekt initialisieren
-  bird = new Bird(box2d, new PVector(200, height - 150));
+  bird = new Bird(box2d, new PVector(200, height - 190));
   
   // Boden erstellen
   createGround();
@@ -97,7 +99,7 @@ void draw() {
   image(backgroundImage, 0, 0);
 
   // Schleuder zeichnen
-  image(slingshotImage, bird.slingshotOrigin.x - slingshotSize / 2, bird.slingshotOrigin.y - slingshotSize / 2, slingshotSize, slingshotSize);
+  image(slingshotImage, bird.slingshotOrigin.x - slingshotSize / 2, bird.slingshotOrigin.y - slingshotSize / 3 +10, slingshotSize, slingshotSize);
 
   // Vogelbewegung und Zeichnung
   bird.display();
@@ -197,7 +199,7 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-  if (!bird.isFlying) {
+  if (key == ' ' &&!bird.isFlying) {
     println("reset");
     bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
   }
