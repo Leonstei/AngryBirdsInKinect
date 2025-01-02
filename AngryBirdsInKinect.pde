@@ -20,7 +20,7 @@ PVector rightHand, leftHand;
 int slingshotSize = 200;
 int count = 0;
 Bird bird;
-float groundHeight = height - 10;
+float groundHeight = height - 10,releaseHight = 100;
 
 void setup() {
   //// Kinect-Einstellungen
@@ -114,7 +114,7 @@ void draw() {
     enemy.checkForBirdCollision(birdPos, birdRadius);
     enemy.checkForImpact(tower.getBlocks());
 
-    drawHand();
+    drawHands();
 }
 
 void createGround() {
@@ -203,9 +203,4 @@ void keyPressed() {
     println("reset");
     bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
   }
-}
-
-void onNewUser(SimpleOpenNI kinect, int userId) {
-  println("Start skeleton tracking");
-  kinect.startTrackingSkeleton(userId);
 }

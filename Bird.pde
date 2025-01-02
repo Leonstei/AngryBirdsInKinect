@@ -115,9 +115,11 @@ class Bird {
 
   void display() {
     drawTrail();
+    
     if(isFlying){
       lifeTime -= 0.05;
       //println(lifeTime);
+      activateAbility();
     }
     if(lifeTime <= 0){
       body.setLinearVelocity(new Vec2(0, 0));
@@ -137,11 +139,12 @@ class Bird {
     }
 
     if (isDragging) {
-      stroke(0);
+      stroke(255,0,0);
       float angle = atan2(slingshotOrigin.y - pos.y, slingshotOrigin.x - pos.x);
       float distance = dist(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
-      println(angle);
+      //println(angle);
       pushMatrix();
+      line(0,releaseHight,width,releaseHight);
       translate(pos.x, pos.y); // Ursprung des Gummibands
       rotate(angle); // Drehe das Bild entsprechend dem Winkel
       image(rubberBandBackImage, 0-getRadius(), rubberBandBackImage.height-1 , distance, rubberBandBackImage.height);

@@ -1,6 +1,7 @@
 void setupKinect(){
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
+  kinect.enableUser(); // Aktiviert Skeleton Tracking
   kinect.enableHand();    // Aktiviert Hand-Tracking
   kinect.startGesture(SimpleOpenNI.GESTURE_CLICK);
   kinect.startGesture(SimpleOpenNI.GESTURE_HAND_RAISE ); // Starte Geste "Wave"
@@ -11,74 +12,97 @@ void setupKinect(){
   leftHand = new PVector(0, 0);
 }
 
-void drawHand(){
-  if(trackedHands.size()==0)return;
-  for (HashMap.Entry<Integer, PVector> entry : trackedHands.entrySet()) {
-    int handId = entry.getKey();
-    PVector handPos = entry.getValue();
-   
-    handPos.x = map(handPos.x, 0, 640, -420, 2160);
-    handPos.y = map(handPos.y, 0, 480, -240, 1680);
 
-  decideIfRightOrLeft(handPos);
+void drawHands(){
+  //if(trackedHands.size()==0)return;
+  IntVector userList = new IntVector();
+  kinect.getUsers(userList);
+  if (userList.size() > 0) {
+    int userId = userList.get(0);
+
+    if (kinect.isTrackingSkeleton(userId)) {
+      //drawSkeleton(userId);
+      drawOneHand(userId,SimpleOpenNI.SKEL_RIGHT_HAND);
+      drawOneHand(userId,SimpleOpenNI.SKEL_LEFT_HAND);
+    }
+  }
+}
+
+void drawOneHand(int userId, int jointId){
+  PVector joint = new PVector();
+  float confidence = kinect.getJointPositionSkeleton(userId, jointId, joint);
+  //println(confidence + ": confidece");
+  if (confidence < 0.5) {
+    return;
+  }
+
+  PVector convertedJoint = new PVector();
+  kinect.convertRealWorldToProjective(joint, convertedJoint);
+
+  convertedJoint.x = map(convertedJoint.x, 0, 640, -420, 2160);
+  convertedJoint.y = map(convertedJoint.y, 0, 480, -240, 1680);
   
-  if (dist(handPos.x, handPos.y, bird.birdPosition.x, bird.birdPosition.y) < 30 && !bird.isFlying) {
+
+  if (jointId == SimpleOpenNI.SKEL_RIGHT_HAND) {
+    smoothHandWithSpeed(convertedJoint,rightHand,rightHand);
+    //rightHand.set(convertedJoint.x, convertedJoint.y);
+  } else if (jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
+    smoothHandWithSpeed(convertedJoint,leftHand,leftHand);
+    //leftHand.set(convertedJoint.x, convertedJoint.y);
+  }
+
+  // Kinect-Interaktion mit dem Vogel
+  if (dist(convertedJoint.x, convertedJoint.y, bird.birdPosition.x, bird.birdPosition.y) < 20) {
     count++;
   }
-  
-  if (count > 20 && dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100) {
+
+  if (count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
     bird.isDragging = true;
-    bird.startDragging(leftHand.x,leftHand.y); // Wenn Hände sich senken, wird der Vogel losgelassen
-    if ( rightHand.y < 50 ) {
+    bird.startDragging(convertedJoint.x,convertedJoint.y); 
+    if (rightHand.y < releaseHight ){
       count = 0;
       bird.releaseWithPower();
     }
   }
-  if(trackedHands.size() == 1){
-    if(handPos.x < width/2){
-      drawLeftHand();
-    }else{
-      drawRightHand();
-    }
-  }else{
-    drawRightHand();
-    drawLeftHand();
-  }
-  }
-}
-void drawRightHand(){
-  image(rightHandOpen, rightHand.x - 50, rightHand.y - 50, 100, 100);
-}
-void drawLeftHand(){
-  if(count > 20){
+
+  // Hand-Symbol zeichnen
+  if(count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND){
     image(handClosed, leftHand.x - 50, leftHand.y - 50, 100, 100);
+  }else if(jointId == SimpleOpenNI.SKEL_RIGHT_HAND){
+    image(rightHandOpen, rightHand.x - 50, rightHand.y - 50, 100, 100);
   }else{
     image(leftHandOpen, leftHand.x - 50, leftHand.y - 50, 100, 100);
   }
 }
+void activateAbility(){
+  IntVector userList = new IntVector();
+  kinect.getUsers(userList);
+  if (userList.size() > 0) {
+    int userId = userList.get(0);
 
- void decideIfRightOrLeft(PVector handPos){
-   if(
-   dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100 && 
-   dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) >100
-   ){
-     smoothHandWithSpeed(handPos,leftHand,leftHand);
-     println(leftHand);
-     //leftHand.set(handPos.x, handPos.y);
-   }else if(
-     dist(handPos.x, handPos.y, rightHand.x, rightHand.y) < 100 && 
-     dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) > 100
-   ){
-     smoothHandWithSpeed(handPos,rightHand,rightHand);
-     //rightHand.set(handPos.x, handPos.y);
-   }else{
-     if (handPos.x >= width / 2) {
-      rightHand.set(handPos.x, handPos.y);
-    } else {
-      leftHand.set(handPos.x, handPos.y);
+    if (kinect.isTrackingSkeleton(userId)) {
+      PVector leftShoulder = new PVector();
+      kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, leftShoulder);
+      kinect.convertRealWorldToProjective(leftShoulder, leftShoulder);
+      PVector rightShoulder = new PVector();
+      kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, rightShoulder);
+      kinect.convertRealWorldToProjective(rightShoulder, rightShoulder);
+      
+      leftShoulder.y = map(leftShoulder.y, 0, 480, -240, 1680);
+      rightShoulder.y = map(rightShoulder.y, 0, 480, -240, 1680);
+      
+      //println("leftshouldery = " + leftShoulder.y  + " left = " + leftHand.y);
+      if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
+        println("actitivate Ability");
+      }
+      
     }
-   }
- }
+  }
+}
+
+
+
+ 
  
  void smoothHandWithSpeed(PVector newPos, PVector oldPos, PVector smoothedPos) {
   float speed = dist(newPos.x, newPos.y, oldPos.x, oldPos.y);
@@ -110,6 +134,10 @@ void updateHandPositionWithDeadband(PVector newPos, PVector oldPos, PVector smoo
  //  )
 
 
+void onNewUser(SimpleOpenNI kinect, int userID) {
+  println("Start skeleton tracking");
+  kinect.startTrackingSkeleton(userID);
+}
 
 void onNewHand(SimpleOpenNI curContext, int handId, PVector pos) {
   //println("Neue Hand erkannt - ID: " + handId + ", Position: " + pos);
