@@ -73,7 +73,17 @@ void drawOneHand(int userId, int jointId){
   }else{
     image(leftHandOpen, leftHand.x - 50, leftHand.y - 50, 100, 100);
   }
+  checkForClap();
+  
 }
+void checkForClap(){
+  if(dist(leftHand.x,leftHand.y,rightHand.x, rightHand.y) <100){
+    println("hello");
+    bird.addMass();
+  }
+}
+
+
 void activateAbility(){
   IntVector userList = new IntVector();
   kinect.getUsers(userList);

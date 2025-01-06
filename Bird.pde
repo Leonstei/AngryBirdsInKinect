@@ -99,6 +99,9 @@ class Bird {
       isFlying = true;
     }
   }
+  void addMass(){
+    this.radius = this.radius *2;
+  }
 
   void resetBird() {
     // Reset the bird to its initial position

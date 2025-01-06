@@ -95,6 +95,7 @@ void draw() {
   if(frameCount%2 == 0){
     kinect.update();
   }
+  
   box2d.step();
 
   // Hintergrund zeichnen
