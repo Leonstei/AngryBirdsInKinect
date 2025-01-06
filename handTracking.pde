@@ -139,27 +139,27 @@ void onNewUser(SimpleOpenNI kinect, int userID) {
   kinect.startTrackingSkeleton(userID);
 }
 
-void onNewHand(SimpleOpenNI curContext, int handId, PVector pos) {
-  //println("Neue Hand erkannt - ID: " + handId + ", Position: " + pos);
-}
+//void onNewHand(SimpleOpenNI curContext, int handId, PVector pos) {
+//  //println("Neue Hand erkannt - ID: " + handId + ", Position: " + pos);
+//}
 
-void onTrackedHand(SimpleOpenNI curContext, int handId, PVector pos) {
-  PVector screenPos = new PVector();
-  kinect.convertRealWorldToProjective(pos, screenPos);
-  trackedHands.put(handId, screenPos);
+//void onTrackedHand(SimpleOpenNI curContext, int handId, PVector pos) {
+//  PVector screenPos = new PVector();
+//  kinect.convertRealWorldToProjective(pos, screenPos);
+//  trackedHands.put(handId, screenPos);
   
-}
-void onLostHand(SimpleOpenNI curContext, int handId) {
-  //println("Hand verloren - ID: " + handId);
-  trackedHands.remove(handId);
-}
+//}
+//void onLostHand(SimpleOpenNI curContext, int handId) {
+//  //println("Hand verloren - ID: " + handId);
+//  trackedHands.remove(handId);
+//}
 
-void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
-  //println("Geste erkannt: " + gestureType + ", Position: " + pos);
-  if(gestureType == 1){
-    println(SimpleOpenNI.GESTURE_CLICK);
-  }
-  // Starte Hand-Tracking
-  int handId = kinect.startTrackingHand(pos);
-  //println("Hand-Tracking gestartet mit ID: " + handId);
-}
+//void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
+//  //println("Geste erkannt: " + gestureType + ", Position: " + pos);
+//  if(gestureType == 1){
+//    println(SimpleOpenNI.GESTURE_CLICK);
+//  }
+//  // Starte Hand-Tracking
+//  int handId = kinect.startTrackingHand(pos);
+//  //println("Hand-Tracking gestartet mit ID: " + handId);
+//}

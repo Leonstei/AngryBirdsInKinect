@@ -119,7 +119,7 @@ class Bird {
     if(isFlying){
       lifeTime -= 0.05;
       //println(lifeTime);
-      activateAbility();
+      //activateAbility();
     }
     if(lifeTime <= 0){
       body.setLinearVelocity(new Vec2(0, 0));
