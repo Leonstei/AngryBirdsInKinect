@@ -33,6 +33,7 @@ void setup() {
   //Fenster Setup
   size(1840, 980);
   float groundHeight = height - 10; // Höhe des Bodens
+  frameRate(75); // Setzt die FPS auf 60
 
 
   // Hände initialisieren
@@ -199,8 +200,10 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-  if (key == ' ' &&!bird.isFlying) {
+  if (key == ' ' && !bird.isFlying) {
     println("reset");
     bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
+  } else if (key == 'h' && bird.isFlying) { // "h" für Heavy Mode
+    bird.activateHeavyMode();
   }
 }

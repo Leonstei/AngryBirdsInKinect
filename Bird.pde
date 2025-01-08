@@ -11,6 +11,7 @@ class Bird {
   boolean isFlying = false; // Gibt an, ob der Vogel fliegt
   boolean isDragging = false; // Gibt an, ob der Vogel gezogen wird
   ArrayList<PVector> trail=new ArrayList<PVector>();
+  boolean heavyModeUsed = false; // Neue Variable: Fähigkeit bereits verwendet
 
   Bird(Box2DProcessing box2d, PVector slingshotOrigin) {
     this.box2d = box2d;
@@ -101,7 +102,6 @@ class Bird {
   }
 
   void resetBird() {
-    // Reset the bird to its initial position
     body.setType(BodyType.STATIC);
     body.setTransform(box2d.coordPixelsToWorld(slingshotOrigin.x, slingshotOrigin.y), 0);
     body.setLinearVelocity(new Vec2(0, 0));
@@ -109,6 +109,9 @@ class Bird {
     isFlying = false;
     isDragging = false;
     lifeTime = 20;
+
+    // Setze Fähigkeit zurück
+    heavyModeUsed = false;
   }
 
 
@@ -160,4 +163,39 @@ class Bird {
   float getRadius() {
     return this.radius;
   }
+  
+  //Fähigeit Heavy Mode
+  void activateHeavyMode() {
+    if (isFlying && !heavyModeUsed) {
+        // Erhöhe Größe und Masse des Vogels
+        radius *= 1.3;
+        updateBodyMass(15);
+
+        // Setze eine starke vertikale Geschwindigkeit
+        body.setLinearVelocity(new Vec2(body.getLinearVelocity().x, -35));
+
+        // Markiere Fähigkeit als verwendet
+        heavyModeUsed = true;
+
+        // Visual Feedback
+        println("Heavy mode activated: Increased size and downward velocity!");
+    }
+}
+
+
+void updateBodyMass(float newDensity) {
+  // Alte Fixtures entfernen und neue mit erhöhter Dichte hinzufügen
+  body.destroyFixture(body.getFixtureList());
+  
+  CircleShape cs = new CircleShape();
+  cs.m_radius = box2d.scalarPixelsToWorld(radius);
+
+  FixtureDef fd = new FixtureDef();
+  fd.shape = cs;
+  fd.density = newDensity; // Neue Dichte
+  fd.friction = 0.1;
+  fd.restitution = 0.3;
+
+  body.createFixture(fd);
+}
 }

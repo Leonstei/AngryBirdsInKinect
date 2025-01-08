@@ -24,9 +24,13 @@ void drawHands(){
       //drawSkeleton(userId);
       drawOneHand(userId,SimpleOpenNI.SKEL_RIGHT_HAND);
       drawOneHand(userId,SimpleOpenNI.SKEL_LEFT_HAND);
-    }
+       //Fähigkeit Downwards
+    }if (rightHand.y - leftHand.y > 100 && bird.isFlying) {
+    bird.activateHeavyMode();
   }
+      }
 }
+
 
 void drawOneHand(int userId, int jointId){
   PVector joint = new PVector();
