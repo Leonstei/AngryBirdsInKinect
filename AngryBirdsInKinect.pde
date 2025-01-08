@@ -9,7 +9,7 @@ SimpleOpenNI kinect;
 Box2DProcessing box2d;
 TowerBlock tower; // Turm-Objekt
 Enemy enemy; 
-
+Level level;
 
 
 PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage, 
@@ -32,8 +32,8 @@ void setup() {
 
   //Fenster Setup
   size(1840, 980);
-  float groundHeight = height - 10; // Höhe des Bodens
   frameRate(75); // Setzt die FPS auf 60
+  
 
 
   // Hände initialisieren
@@ -71,20 +71,15 @@ void setup() {
   // Tower-Objekt initialisieren
   tower = new TowerBlock(box2d);
 
-  // Haus Obejkt initialisieren
-  tower.buildSimpleHouse(new PVector(900, height - 50), 40, 20); 
-  tower.buildSimpleHouse(new PVector(900, height - 150), 40, 20); 
-  tower.buildSimpleHouse(new PVector(900, height - 300), 40, 20); 
-  tower.buildSimpleHouse(new PVector(900, height - 450), 40, 20); 
-
   // Gegner-Objekt initialisieren
   enemy = new Enemy(box2d);
+  
+  level = new Level(box2d, tower, enemy, bird);
 
-  // Gegner hinzufügen
-  enemy.addEnemy(900, height - 55, 30); // Position (600, Höhe - 100), Radius 20
-  enemy.addEnemy(900, height - 200, 30); // Position (600, Höhe - 100), Radius 20
-  enemy.addEnemy(900, height - 330, 30); // Position (600, Höhe - 100), Radius 20
-  enemy.addEnemy(900, height - 460, 50); // Position (600, Höhe - 100), Radius 20
+
+  // Lade Level 1 standardmäßig
+  level.loadLevel(1);
+
 
   //Assets zu Gegner und Türmen hinzufügen
   enemy.enemyImage = enemySprite;
@@ -200,10 +195,16 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-  if (key == ' ' && !bird.isFlying) {
-    println("reset");
-    bird.resetBird(); // Nur zurücksetzen, wenn der Vogel nicht fliegt
-  } else if (key == 'h' && bird.isFlying) { // "h" für Heavy Mode
-    bird.activateHeavyMode();
-  }
+    if (key == ' ') {
+        println("reset");
+        bird.resetBird();
+    } else if (key == '1') {
+        level.loadLevel(1);
+    } else if (key == '2') {
+        level.loadLevel(2);
+    } else if (key == '3') {
+        level.loadLevel(3);
+    } else if (key == 'h' && bird.isFlying) { // "h" für Heavy Mode
+        bird.activateHeavyMode();
+    } 
 }
