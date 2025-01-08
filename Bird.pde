@@ -5,14 +5,18 @@ class Bird {
   PVector slingshotOrigin; // Ursprung der Schleuder
   PVector birdPosition; // Aktuelle Position des Vogels in Pixeln
   PVector stretch; // Stretch-Vektor für die Schleuder
+  PVector direction;
   float radius = 25;
   float maxStretch = 100; // Maximale Stretch-Distanz
   float lifeTime = 20;
   boolean isFlying = false; // Gibt an, ob der Vogel fliegt
   boolean isDragging = false; // Gibt an, ob der Vogel gezogen wird
   ArrayList<PVector> trail=new ArrayList<PVector>();
-  boolean heavyModeUsed = false; // Neue Variable: Fähigkeit bereits verwendet
-  boolean splitModeUsed = false; // Track if split mode has been used
+  //boolean heavyModeUsed = false; // Neue Variable: Fähigkeit bereits verwendet
+  //boolean splitModeUsed = false; // Track if split mode has been used
+  boolean isAbility = false;
+  boolean isAbilityLock = false;
+  boolean isDirectionSet = false;
   ArrayList<Bird> splitBirds = new ArrayList<>();
 
 
@@ -26,9 +30,9 @@ class Bird {
   }
 
   void makeBody(float x, float y) {
-        if (body != null) {
-        println("Warning: A body already exists. Destroying old body.");
-        box2d.destroyBody(body);
+    if (body != null) {
+      println("Warning: A body already exists. Destroying old body.");
+      box2d.destroyBody(body);
     }
 
     BodyDef bd = new BodyDef();
@@ -71,6 +75,9 @@ class Bird {
       isDragging = true;
       body.setLinearVelocity(new Vec2(0, 0)); // Stop any movement
     }
+    if (dist(mouseX, mouseY, pos.x, pos.y) > radius && isFlying && mouseButton == LEFT && isAbilityLock == false) {
+      isAbility = true;
+    }
   }
 
   void startDragging(float mouseX, float mouseY) {
@@ -109,18 +116,18 @@ class Bird {
     }
   }
 
-void resetBird() {
+  void resetBird() {
     // Entferne alle Vogelkörper (inklusive Split-Birds und eventuelle Überbleibsel)
     for (Bird splitBird : splitBirds) {
-        if (splitBird.body != null) {
-            box2d.destroyBody(splitBird.body);
-        }
+      if (splitBird.body != null) {
+        box2d.destroyBody(splitBird.body);
+      }
     }
     splitBirds.clear();
 
     if (body != null) {
-        box2d.destroyBody(body);
-        body = null;
+      box2d.destroyBody(body);
+      body = null;
     }
 
     // Erstelle den Hauptvogel neu
@@ -131,154 +138,177 @@ void resetBird() {
     updateBodyMass(5); // Ursprüngliches Gewicht
     isFlying = false;
     isDragging = false;
+    isAbility = false;
+    isAbilityLock = false;
     lifeTime = 20;
-    splitModeUsed = false;
-    heavyModeUsed = false;
+    //isAbilityLock = false;
+    //heavyModeUsed = false;
 
     // Lösche den Trail
     trail.clear();
 
     println("Bird fully reset.");
-}
+  }
 
 
 
 
 
 
-void display() {
-    if (!isFlying && splitModeUsed) {
-        // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
-        for (Bird splitBird : splitBirds) {
-            splitBird.display(); // Anzeige der kleineren Vögel
-        }
-        return;
+  void display() {
+    if (!isFlying && isAbilityLock) {
+      // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
+      for (Bird splitBird : splitBirds) {
+        splitBird.display(); // Anzeige der kleineren Vögel
+      }
+      return;
     }
 
     drawTrail();
 
     if (isFlying) {
-        lifeTime -= 0.05;
-        activateAbility();
+      lifeTime -= 0.05;
+      activateAbility();
     }
 
     if (lifeTime <= 0) {
-        body.setLinearVelocity(new Vec2(0, 0));
-        body.setAngularVelocity(0);
-        isFlying = false;
-        isDragging = false;
-        return;
+      body.setLinearVelocity(new Vec2(0, 0));
+      body.setAngularVelocity(0);
+      isFlying = false;
+      isDragging = false;
+      return;
     }
 
     PVector pos = getPixelPosition();
 
     if (!isDragging) {
-        trail.add(pos);
-        pushMatrix();
-        translate(pos.x, pos.y);
-        image(birdImage, -radius, -radius, radius * 2, radius * 2);
-        popMatrix();
+      trail.add(pos);
+      pushMatrix();
+      translate(pos.x, pos.y);
+      image(birdImage, -radius, -radius, radius * 2, radius * 2);
+      popMatrix();
     }
 
     if (isDragging) {
-        stroke(255, 0, 0);
-        float angle = atan2(slingshotOrigin.y - pos.y, slingshotOrigin.x - pos.x);
-        float distance = dist(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
+      stroke(255, 0, 0);
+      float angle = atan2(slingshotOrigin.y - pos.y, slingshotOrigin.x - pos.x);
+      float distance = dist(slingshotOrigin.x, slingshotOrigin.y, pos.x, pos.y);
 
-        pushMatrix();
-        line(0, releaseHight, width, releaseHight);
-        translate(pos.x, pos.y);
-        rotate(angle);
-        image(rubberBandBackImage, 0 - getRadius(), rubberBandBackImage.height - 1, distance, rubberBandBackImage.height);
-        image(birdImage, -radius, -radius, radius * 2, radius * 2);
-        image(rubberBandImage, 0 - getRadius(), 0, distance, getRadius() * 0.7);
-        popMatrix();
+      pushMatrix();
+      line(0, releaseHight, width, releaseHight);
+      translate(pos.x, pos.y);
+      rotate(angle);
+      image(rubberBandBackImage, 0 - getRadius(), rubberBandBackImage.height - 1, distance, rubberBandBackImage.height);
+      image(birdImage, -radius, -radius, radius * 2, radius * 2);
+      image(rubberBandImage, 0 - getRadius(), 0, distance, getRadius() * 0.7);
+      popMatrix();
     }
-}
+  }
 
 
   float getRadius() {
     return this.radius;
   }
-  
+
   //Fähigeit Heavy Mode
   void activateHeavyMode() {
-    if (isFlying && !heavyModeUsed) {
-        // Erhöhe Größe und Masse des Vogels
-        radius *= 1.3;
-        updateBodyMass(15);
+    if (isFlying && !isAbilityLock) {
+      // Erhöhe Größe und Masse des Vogels
+      radius *= 1.3;
+      updateBodyMass(15);
 
-        // Setze eine starke vertikale Geschwindigkeit
-        body.setLinearVelocity(new Vec2(body.getLinearVelocity().x, -35));
+      // Setze eine starke vertikale Geschwindigkeit
+      body.setLinearVelocity(new Vec2(body.getLinearVelocity().x, -35));
 
-        // Markiere Fähigkeit als verwendet
-        heavyModeUsed = true;
+      // Markiere Fähigkeit als verwendet
+      isAbilityLock = true;
 
-        // Visual Feedback
-        println("Heavy mode activated: Increased size and downward velocity!");
+      // Visual Feedback
+      println("Heavy mode activated: Increased size and downward velocity!");
     }
-}
+  }
 
-void activateSplitMode() {
-    if (isFlying && !splitModeUsed) {
-        splitModeUsed = true;
+  void activateSplitMode() {
+    if (isFlying && !isAbilityLock) {
+      isAbilityLock = true;
 
-        // Holen Sie die aktuelle Position und Geschwindigkeit des Vogels
-        PVector currentPosition = getPixelPosition();
-        Vec2 currentVelocity = body.getLinearVelocity();
+      // Holen Sie die aktuelle Position und Geschwindigkeit des Vogels
+      PVector currentPosition = getPixelPosition();
+      Vec2 currentVelocity = body.getLinearVelocity();
 
-        // Winkel für die kleinen Vögel
-        float angleOffset = PI / 8; // Unterschied in Flugbahnen
+      // Winkel für die kleinen Vögel
+      float angleOffset = PI / 8; // Unterschied in Flugbahnen
 
-        // Erstellen der drei neuen Vögel
-        for (int i = -1; i <= 1; i++) {
-            Bird splitBird = new Bird(box2d, slingshotOrigin);
-            splitBird.radius = this.radius * 0.8f; // Kleinere Vögel
-            splitBird.lifeTime = this.lifeTime / 2; // Kürzere Lebensdauer
-            splitBird.makeBody(currentPosition.x, currentPosition.y);
+      // Erstellen der drei neuen Vögel
+      for (int i = -1; i <= 1; i++) {
+        Bird splitBird = new Bird(box2d, slingshotOrigin);
+        splitBird.radius = this.radius * 0.8f; // Kleinere Vögel
+        splitBird.lifeTime = this.lifeTime / 2; // Kürzere Lebensdauer
+        splitBird.makeBody(currentPosition.x, currentPosition.y);
 
-            // Setzen der Masse der kleineren Vögel
-            splitBird.updateBodyMass(4f); // Weniger Masse für kleinere Vögel
+        // Setzen der Masse der kleineren Vögel
+        splitBird.updateBodyMass(4f); // Weniger Masse für kleinere Vögel
 
-            // Setzen der Geschwindigkeit für jeden Vogel
-            float angle = atan2(currentVelocity.y, currentVelocity.x) + (i * angleOffset);
-            float speed = currentVelocity.length();
-            Vec2 newVelocity = new Vec2(cos(angle) * speed, sin(angle) * speed);
+        // Setzen der Geschwindigkeit für jeden Vogel
+        float angle = atan2(currentVelocity.y, currentVelocity.x) + (i * angleOffset);
+        float speed = currentVelocity.length();
+        Vec2 newVelocity = new Vec2(cos(angle) * speed, sin(angle) * speed);
 
-            splitBird.body.setType(BodyType.DYNAMIC);
-            splitBird.body.setLinearVelocity(newVelocity);
+        splitBird.body.setType(BodyType.DYNAMIC);
+        splitBird.body.setLinearVelocity(newVelocity);
 
-            // Zur Liste der Split-Vögel hinzufügen
-            splitBirds.add(splitBird);
-        }
+        // Zur Liste der Split-Vögel hinzufügen
+        splitBirds.add(splitBird);
+      }
 
-        // Hauptvogel "deaktivieren"
-        body.setType(BodyType.STATIC);
-        isFlying = false; // Der Hauptvogel ist nicht mehr im Flug
-        trail.clear(); // Reset des Trails
+      // Hauptvogel "deaktivieren"
+      body.setType(BodyType.STATIC);
+      isFlying = false; // Der Hauptvogel ist nicht mehr im Flug
+      trail.clear(); // Reset des Trails
 
-        println("Split mode activated: Bird divided into 3 smaller birds!");
+      println("Split mode activated: Bird divided into 3 smaller birds!");
     }
-}
+  }
+  void activateTarget() {
+    if (isAbility == true) {
+      PVector birdPos = getPixelPosition();
+      direction = new PVector(mouseX-birdPos.x, mouseY-birdPos.y);  // Mausposition
+      direction.normalize();
+
+      isAbility = false;  // Setze die Fähigkeit zurück
+      isAbilityLock = true;
+      float speed = 1000;  // Geschwindigkeit des Vogels
+      Vec2 velocity = box2d.vectorPixelsToWorld(new Vec2(direction.x * speed, direction.y * speed));
+
+      // Setze die Geschwindigkeit des Vogels in Richtung der Maus
+      body.setLinearVelocity(velocity);
+      //body.setAngularVelocity(1);  // Wenn der Vogel sich drehen soll, behalte dies bei
+      //birdsize *=2;
+      //radius.x *=4;
+      isFlying = true;
+      isDragging = false;
+      return;
+    }
+  }
 
 
 
 
 
 
-void updateBodyMass(float newDensity) {
-  // Alte Fixtures entfernen und neue mit erhöhter Dichte hinzufügen
-  body.destroyFixture(body.getFixtureList());
-  
-  CircleShape cs = new CircleShape();
-  cs.m_radius = box2d.scalarPixelsToWorld(radius);
+  void updateBodyMass(float newDensity) {
+    // Alte Fixtures entfernen und neue mit erhöhter Dichte hinzufügen
+    body.destroyFixture(body.getFixtureList());
 
-  FixtureDef fd = new FixtureDef();
-  fd.shape = cs;
-  fd.density = newDensity; // Neue Dichte
-  fd.friction = 0.1;
-  fd.restitution = 0.3;
+    CircleShape cs = new CircleShape();
+    cs.m_radius = box2d.scalarPixelsToWorld(radius);
 
-  body.createFixture(fd);
-}
+    FixtureDef fd = new FixtureDef();
+    fd.shape = cs;
+    fd.density = newDensity; // Neue Dichte
+    fd.friction = 0.1;
+    fd.restitution = 0.3;
+
+    body.createFixture(fd);
+  }
 }

@@ -234,6 +234,9 @@ void drawJoint(int userId, int jointId) {
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
+   if(bird.isFlying){
+    bird.activateTarget();
+  }
 }
 
 void mouseDragged() {
@@ -245,7 +248,7 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-    if (key == ' ') {
+    if (key == 'r') {
         println("reset");
         bird.resetBird();
     } else if (key == '1') {
