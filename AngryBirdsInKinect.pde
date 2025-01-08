@@ -14,13 +14,18 @@ Level level;
 
 PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage, 
 rubberBandImage, rubberBandBackImage;
+
+
+
 HashMap<Integer, PVector> trackedHands = new HashMap<Integer, PVector>();
+
 
 PVector rightHand, leftHand;
 int slingshotSize = 200;
 int count = 0;
 Bird bird;
 float groundHeight = height - 10,releaseHight = 100;
+ArrayList<Button> buttons;
 
 void setup() {
   //// Kinect-Einstellungen
@@ -33,7 +38,26 @@ void setup() {
   //Fenster Setup
   size(1840, 980);
   frameRate(75); // Setzt die FPS auf 60
+  buttons = new ArrayList<Button>();
   
+  PImage buttonOneNormal = loadImage("buttononeclear.png");
+  PImage buttonOneHover = loadImage("buttonone.png");
+  
+  PImage buttonTwoNormal = loadImage("buttontwoclear.png");
+  PImage buttonTwoHover = loadImage("buttontwo.png");
+  
+  PImage buttonThreeNormal = loadImage("buttonthreeclear.png");
+  PImage buttonThreeHover = loadImage("buttonthree.png");
+  
+  PImage resetNormal = loadImage("buttonresetclear.png");
+  PImage resetHover = loadImage("buttonreset.png");
+  
+  // Buttons hinzufügen (Position, Größe, Bilder)
+  buttons.add(new Button(new PVector(100, 10), new PVector(200, 200), buttonOneNormal, buttonOneHover)); // Button 1
+  buttons.add(new Button(new PVector(350, 10), new PVector(200, 200), buttonTwoNormal, buttonTwoHover)); // Button 2
+  buttons.add(new Button(new PVector(600, 10), new PVector(200, 200), buttonThreeNormal, buttonThreeHover)); // Button 3
+  buttons.add(new Button(new PVector(850, 10), new PVector(200, 200), resetNormal, resetHover)); // Reset Button
+
 
 
   // Hände initialisieren
@@ -93,6 +117,32 @@ void draw() {
 
   // Hintergrund zeichnen
   image(backgroundImage, 0, 0);
+  
+    // Buttons anzeigen
+  for (Button button : buttons) {
+    button.display();
+  }
+  
+ for (Button button : buttons) {
+    button.display(); // Button zeichnen
+    button.update(rightHand, leftHand);
+
+    if (button.isActivated()) {
+      if (button == buttons.get(0)) {
+        println("Level 1 wird geladen!");
+        level.loadLevel(1);
+      } else if (button == buttons.get(1)) {
+        println("Level 2 wird geladen!");
+        level.loadLevel(2);
+      } else if (button == buttons.get(2)) {
+        println("Level 3 wird geladen!");
+        level.loadLevel(3);
+      } else if (button == buttons.get(3)) {
+        println("Vogel wird zurückgesetzt!");
+        bird.resetBird();
+      }
+    }
+  }
 
   // Schleuder zeichnen
   image(slingshotImage, bird.slingshotOrigin.x - slingshotSize / 2, bird.slingshotOrigin.y - slingshotSize / 3 +10, slingshotSize, slingshotSize);
