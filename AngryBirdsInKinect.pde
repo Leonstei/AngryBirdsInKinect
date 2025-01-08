@@ -256,5 +256,9 @@ void keyPressed() {
         level.loadLevel(3);
     } else if (key == 'h' && bird.isFlying) { // "h" für Heavy Mode
         bird.activateHeavyMode();
-    } 
+    }  else if (key == 's' && bird.isFlying) {
+    bird.activateSplitMode();
+  }
+
+
 }

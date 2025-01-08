@@ -27,9 +27,13 @@ void drawHands(){
        //Fähigkeit Downwards
     }if (rightHand.y - leftHand.y > 100 && bird.isFlying) {
     bird.activateHeavyMode();
-  }
-      }
+    }     if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1500 && bird.isFlying && !bird.splitModeUsed) {
+    bird.activateSplitMode();
 }
+    }
+  }
+
+
 
 
 void drawOneHand(int userId, int jointId){
