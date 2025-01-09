@@ -290,6 +290,27 @@ class Bird {
       return;
     }
   }
+    void activateTargetKin( PVector rightHand) {
+    if (isAbility == true) {
+      PVector birdPos = getPixelPosition();
+      direction = new PVector(rightHand.x-birdPos.x, rightHand.y-birdPos.y);  // Handposition
+      direction.normalize();
+
+      isAbility = false;  // Setze die Fähigkeit zurück
+      isAbilityLock = true;
+      float speed = 1000;  // Geschwindigkeit des Vogels
+      Vec2 velocity = box2d.vectorPixelsToWorld(new Vec2(direction.x * speed, direction.y * speed));
+
+      // Setze die Geschwindigkeit des Vogels in Richtung der Maus
+      body.setLinearVelocity(velocity);
+      //body.setAngularVelocity(1);  // Wenn der Vogel sich drehen soll, behalte dies bei
+      //birdsize *=2;
+      //radius.x *=4;
+      isFlying = true;
+      isDragging = false;
+      return;
+    }
+  }
 
 
 
