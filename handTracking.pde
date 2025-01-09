@@ -100,8 +100,19 @@ void activateAbility(){
       rightShoulder.y = map(rightShoulder.y, 0, 480, -240, 1680);
       
       //println("leftshouldery = " + leftShoulder.y  + " left = " + leftHand.y);
-      if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
-        println("actitivate Ability");
+      //if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
+      //  println("actitivate Ability");
+      //  bird.activateSplitMode();
+      //}
+      
+      // if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
+      //  println("actitivate Ability");
+      //  bird.activateHeavyMode();
+      //}
+      
+       if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
+        println("actvate Ability");
+        bird.activateTargetKin(rightHand);
       }
       
     }
