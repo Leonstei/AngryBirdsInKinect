@@ -290,8 +290,9 @@ class Bird {
       return;
     }
   }
-    void activateTargetKin( PVector rightHand) {
+    void activateTargetKin(PVector rightHand) {
     if (isAbility == true) {
+      println(rightHand);
       PVector birdPos = getPixelPosition();
       direction = new PVector(rightHand.x-birdPos.x, rightHand.y-birdPos.y);  // Handposition
       direction.normalize();
