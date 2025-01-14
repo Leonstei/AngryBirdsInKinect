@@ -171,12 +171,8 @@ class Bird {
 
     if (isFlying) {
       lifeTime -= 0.05;
-<<<<<<< HEAD
-      //println(lifeTime);
-      //activateAbility();
-=======
       activateAbility();
->>>>>>> dd0c606fb3d47b465d8d333d82b4fc1d34df5739
+
     }
 
     if (lifeTime <= 0) {

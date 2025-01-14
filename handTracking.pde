@@ -77,22 +77,10 @@ void drawOneHand(int userId, int jointId) {
   } else {
     image(leftHandOpen, leftHand.x - 50, leftHand.y - 50, 100, 100);
   }
-  checkForClap();
   
 }
-<<<<<<< HEAD
-void checkForClap(){
-  if(dist(leftHand.x,leftHand.y,rightHand.x, rightHand.y) <100){
-    println("hello");
-    bird.addMass();
-  }
-}
 
-
-void activateAbility(){
-=======
 void activateAbility() {
->>>>>>> dd0c606fb3d47b465d8d333d82b4fc1d34df5739
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
   if (userList.size() > 0) {
@@ -174,32 +162,6 @@ void onNewUser(SimpleOpenNI kinect, int userID) {
   kinect.startTrackingSkeleton(userID);
 }
 
-//void onNewHand(SimpleOpenNI curContext, int handId, PVector pos) {
-//  //println("Neue Hand erkannt - ID: " + handId + ", Position: " + pos);
-//}
-
-<<<<<<< HEAD
-//void onTrackedHand(SimpleOpenNI curContext, int handId, PVector pos) {
-//  PVector screenPos = new PVector();
-//  kinect.convertRealWorldToProjective(pos, screenPos);
-//  trackedHands.put(handId, screenPos);
-  
-//}
-//void onLostHand(SimpleOpenNI curContext, int handId) {
-//  //println("Hand verloren - ID: " + handId);
-//  trackedHands.remove(handId);
-//}
-
-//void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
-//  //println("Geste erkannt: " + gestureType + ", Position: " + pos);
-//  if(gestureType == 1){
-//    println(SimpleOpenNI.GESTURE_CLICK);
-//  }
-//  // Starte Hand-Tracking
-//  int handId = kinect.startTrackingHand(pos);
-//  //println("Hand-Tracking gestartet mit ID: " + handId);
-//}
-=======
 void onTrackedHand(SimpleOpenNI curContext, int handId, PVector pos) {
   PVector screenPos = new PVector();
   kinect.convertRealWorldToProjective(pos, screenPos);
@@ -219,4 +181,3 @@ void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
   int handId = kinect.startTrackingHand(pos);
   //println("Hand-Tracking gestartet mit ID: " + handId);
 }
->>>>>>> dd0c606fb3d47b465d8d333d82b4fc1d34df5739
