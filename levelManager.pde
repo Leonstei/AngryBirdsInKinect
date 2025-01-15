@@ -76,5 +76,12 @@ class Level {
         enemy.enemies.clear();
         enemy.radii.clear();
         enemy.alive.clear();
+        
+         // Punkte und Schüsse zurücksetzen
+          score = 0;
+          shotsFired = 0;
+          gameWon = false; // Win-Screen zurücksetzen
+          bonusAwarded = false; // Bonusvergabe zurücksetzen
+
     }
 }
