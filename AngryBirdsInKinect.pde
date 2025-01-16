@@ -8,12 +8,12 @@ import org.jbox2d.dynamics.*;
 SimpleOpenNI kinect;
 Box2DProcessing box2d;
 TowerBlock tower; // Turm-Objekt
-Enemy enemy; 
+Enemy enemy;
 Level level;
 
 
-PImage backgroundImage,rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage, 
-rubberBandImage, rubberBandBackImage;
+PImage backgroundImage, rightHandOpen, leftHandOpen, handClosed, slingshotImage, birdImage, enemySprite, woodImage,
+  rubberBandImage, rubberBandBackImage;
 
 
 
@@ -24,7 +24,7 @@ PVector rightHand, leftHand;
 int slingshotSize = 200;
 int count = 0;
 Bird bird;
-float groundHeight = height - 10,releaseHight = 100;
+float groundHeight = height - 10, releaseHight = 100;
 ArrayList<Button> buttons;
 
 
@@ -48,19 +48,19 @@ void setup() {
   size(1840, 980);
   frameRate(75); // Setzt die FPS auf 60
   buttons = new ArrayList<Button>();
-  
+
   PImage buttonOneNormal = loadImage("buttononeclear.png");
   PImage buttonOneHover = loadImage("buttonone.png");
-  
+
   PImage buttonTwoNormal = loadImage("buttontwoclear.png");
   PImage buttonTwoHover = loadImage("buttontwo.png");
-  
+
   PImage buttonThreeNormal = loadImage("buttonthreeclear.png");
   PImage buttonThreeHover = loadImage("buttonthree.png");
-  
+
   PImage resetNormal = loadImage("buttonresetclear.png");
   PImage resetHover = loadImage("buttonreset.png");
-  
+
   // Buttons hinzufügen (Position, Größe, Bilder)
   buttons.add(new Button(new PVector(100, 10), new PVector(200, 200), buttonOneNormal, buttonOneHover)); // Button 1
   buttons.add(new Button(new PVector(350, 10), new PVector(200, 200), buttonTwoNormal, buttonTwoHover)); // Button 2
@@ -90,14 +90,14 @@ void setup() {
     backgroundImage.resize(width, height);
   }
 
- // Box2D initialisieren
+  // Box2D initialisieren
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
   box2d.setGravity(0, -25);
 
   // Vogel-Objekt initialisieren
   bird = new Bird(box2d, new PVector(200, height - 190));
-  
+
   // Boden erstellen
   createGround();
 
@@ -106,7 +106,7 @@ void setup() {
 
   // Gegner-Objekt initialisieren
   enemy = new Enemy(box2d);
-  
+
   level = new Level(box2d, tower, enemy, bird);
 
 
@@ -121,21 +121,22 @@ void setup() {
 
 void draw() {
   // Kinect-Update
-  if(frameCount%2 == 0){
+  if (frameCount%2 == 0) {
     kinect.update();
   }
-  
+  Vec2 velocity = bird.body.getLinearVelocity(); //  Geschwindigkeit des Vogels
+  float birdSpeed = velocity.length(); // Betrag des Geschwindigkeitsvektors
   box2d.step();
 
   // Hintergrund zeichnen
   image(backgroundImage, 0, 0);
-  
-    // Buttons anzeigen
+
+  // Buttons anzeigen
   for (Button button : buttons) {
     button.display();
   }
-  
- for (Button button : buttons) {
+
+  for (Button button : buttons) {
     button.display(); // Button zeichnen
     button.update(rightHand, leftHand);
 
@@ -160,34 +161,34 @@ void draw() {
   image(slingshotImage, bird.slingshotOrigin.x - slingshotSize / 2, bird.slingshotOrigin.y - slingshotSize / 3 +10, slingshotSize, slingshotSize);
 
   // Vogelbewegung und Zeichnung
-  bird.display();
-  
+  bird.display(birdSpeed);
+
   // Turm anzeigen
   tower.display();
-  
+
   // Punktestand anzeigen
-    displayScore();
-    displayShotsFired();
+  displayScore();
+  displayShotsFired();
 
-    // Prüfen, ob alle Gegner tot sind
-    if (enemy.allEnemiesDefeated()) {
-        gameWon = true;
-    }
-    
-    // Win-Screen überlagern, falls das Spiel gewonnen wurde
-    if (gameWon) {
-        displayWinScreen(); // Win-Screen in der Mitte
-    }
+  // Prüfen, ob alle Gegner tot sind
+  if (enemy.allEnemiesDefeated()) {
+    gameWon = true;
+  }
 
-    PVector birdPos = bird.getPixelPosition();
-    float birdRadius = bird.getRadius();
-    Vec2 velocity = bird.body.getLinearVelocity(); //  Geschwindigkeit des Vogels
-    float birdSpeed = velocity.length(); // Betrag des Geschwindigkeitsvektors
-    enemy.display();
-    enemy.checkForBirdCollision(birdPos, birdRadius);
-    enemy.checkForImpact(tower.getBlocks());
+  // Win-Screen überlagern, falls das Spiel gewonnen wurde
+  if (gameWon) {
+    displayWinScreen(); // Win-Screen in der Mitte
+  }
 
-    drawHands();
+  PVector birdPos = bird.getPixelPosition();
+  float birdRadius = bird.getRadius();
+  //Vec2 velocity = bird.body.getLinearVelocity(); //  Geschwindigkeit des Vogels
+  //float birdSpeed = velocity.length(); // Betrag des Geschwindigkeitsvektors
+  enemy.display();
+  enemy.checkForBirdCollision(birdPos, birdRadius);
+  enemy.checkForImpact(tower.getBlocks());
+
+  drawHands();
 }
 
 void createGround() {
@@ -241,11 +242,11 @@ void drawJoint(int userId, int jointId) {
   }
 
   if (count > 20 && jointId == SimpleOpenNI.SKEL_LEFT_HAND) {
-  //  bird.startDragging(convertedJoint); // Dragging starts with Kinect hand
+    //  bird.startDragging(convertedJoint); // Dragging starts with Kinect hand
     // Wenn Hände sich senken, wird der Vogel losgelassen
     if (rightHand.y < 50) {
       count = 0;
-     // bird.releaseWithPower(0.4);
+      // bird.releaseWithPower(0.4);
     }
   }
 
@@ -261,7 +262,7 @@ void drawJoint(int userId, int jointId) {
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
-   if(bird.isFlying){
+  if (bird.isFlying) {
     bird.activateTarget();
   }
 }
@@ -275,61 +276,63 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-    if (key == 'r') {
-        println("reset");
-        bird.resetBird();
-    } else if (key == '1') {
-        level.loadLevel(1);
-    } else if (key == '2') {
-        level.loadLevel(2);
-    } else if (key == '3') {
-        level.loadLevel(3);
-    } else if (key == 'h' && bird.isFlying) { // "h" für Heavy Mode
-        bird.activateHeavyMode();
-    }  else if (key == 's' && bird.isFlying) {
+  if (key == 'r') {
+    println("reset");
+    bird.resetBird();
+  } else if (key == '1') {
+    level.loadLevel(1);
+  } else if (key == '2') {
+    level.loadLevel(2);
+  } else if (key == '3') {
+    level.loadLevel(3);
+  } else if (key == 'h' && bird.isFlying) { // "h" für Heavy Mode
+    bird.activateHeavyMode();
+  } else if (key == 's' && bird.isFlying) {
     bird.activateSplitMode();
+  } else if (key == 'r') {
+    bird.resetBird();
   }
 }
 
 
 void displayScore() {
-    fill(255);
-    textSize(24);
-    text("Score: " + score, 50, 50);
+  fill(255);
+  textSize(24);
+  text("Score: " + score, 50, 50);
 }
 
 void displayShotsFired() {
-    fill(255);
-    textSize(24);
-    text("Shots: " + shotsFired, 50, 80);
+  fill(255);
+  textSize(24);
+  text("Shots: " + shotsFired, 50, 80);
 }
 
 void displayWinScreen() {
-    // Bonuspunkte nur einmal vergeben, wenn das Spiel gewonnen wurde
-    if (gameWon && !bonusAwarded) {
-        if (shotsFired == 1) {
-            score += 300; // Bonus für einen Schuss
-        } else if (shotsFired == 2) {
-            score += 200; // Bonus für zwei Schüsse
-        } else if (shotsFired == 3) {
-            score += 100; // Bonus für drei Schüsse
-        }
-        bonusAwarded = true; // Bonus wurde vergeben
+  // Bonuspunkte nur einmal vergeben, wenn das Spiel gewonnen wurde
+  if (gameWon && !bonusAwarded) {
+    if (shotsFired == 1) {
+      score += 300; // Bonus für einen Schuss
+    } else if (shotsFired == 2) {
+      score += 200; // Bonus für zwei Schüsse
+    } else if (shotsFired == 3) {
+      score += 100; // Bonus für drei Schüsse
     }
+    bonusAwarded = true; // Bonus wurde vergeben
+  }
 
-    // Halbtransparenter Hintergrund
-    fill(0, 150);
-    rectMode(CENTER);
-    rect(width / 2, height / 2, 400, 200);
+  // Halbtransparenter Hintergrund
+  fill(0, 150);
+  rectMode(CENTER);
+  rect(width / 2, height / 2, 400, 200);
 
-    // Textanzeige
-    textAlign(CENTER);
-    textSize(36);
-    fill(255, 255, 0);
-    text("You Win!", width / 2, height / 2 - 40);
-    text("Score: " + score, width / 2, height / 2);
-    text("Shots Used: " + shotsFired, width / 2, height / 2 + 40);
-    textSize(16);
-    fill(255);
-    text("Press 1, 2, or 3 to load a new level", width / 2, height / 2 + 80);
+  // Textanzeige
+  textAlign(CENTER);
+  textSize(36);
+  fill(255, 255, 0);
+  text("You Win!", width / 2, height / 2 - 40);
+  text("Score: " + score, width / 2, height / 2);
+  text("Shots Used: " + shotsFired, width / 2, height / 2 + 40);
+  textSize(16);
+  fill(255);
+  text("Press 1, 2, or 3 to load a new level", width / 2, height / 2 + 80);
 }

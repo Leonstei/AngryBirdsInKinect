@@ -23,16 +23,23 @@ void drawHands() {
     if (kinect.isTrackingSkeleton(userId)) {
       //drawSkeleton(userId);
 
-      drawOneHand(userId,SimpleOpenNI.SKEL_RIGHT_HAND);
-      drawOneHand(userId,SimpleOpenNI.SKEL_LEFT_HAND);
-       //Fähigkeit Downwards
-    }if (rightHand.y - leftHand.y > 100 && bird.isFlying) {
-    bird.activateHeavyMode();
-    }     if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1800 && bird.isFlying) {
-    bird.activateSplitMode();
-}
+      drawOneHand(userId, SimpleOpenNI.SKEL_RIGHT_HAND);
+      drawOneHand(userId, SimpleOpenNI.SKEL_LEFT_HAND);
+      //Fähigkeit Downwards
+    }
+    if (rightHand.y - leftHand.y > 100 && bird.isFlying) { //Wenn die rechte Hand tiefer als die linke Hand ist
+      bird.activateHeavyMode();
+    }
+    if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1800 && bird.isFlying) {
+      bird.activateSplitMode();
+    }
+    if (leftHand.y < 500 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
+ 
+      bird.activateTargetKin(rightHand);
+      
     }
   }
+}
 
 
 
@@ -83,7 +90,6 @@ void drawOneHand(int userId, int jointId) {
   } else {
     image(leftHandOpen, leftHand.x - 50, leftHand.y - 50, 100, 100);
   }
-  
 }
 
 void activateAbility() {
@@ -120,7 +126,7 @@ void activateAbility() {
       //  bird.activateSplitMode();
       //}
 
-      if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200) {
+      if (abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200) {
         println("activate Ability");
         bird.activateTargetKin(rightHand);
       }
@@ -181,7 +187,7 @@ void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
   //println("Geste erkannt: " + gestureType + ", Position: " + pos);
   if (gestureType == 1) {
     println(SimpleOpenNI.GESTURE_CLICK);
-    if(bird.isFlying){
+    if (bird.isFlying) {
       PVector screenPos = new PVector();
       kinect.convertRealWorldToProjective(pos, screenPos);
       bird.setVelocityTowards(screenPos);

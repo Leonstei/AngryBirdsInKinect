@@ -159,27 +159,26 @@ class Bird {
 
 
 
-  void display() {
+  void display(float Speed) {
     if (!isFlying && AbilityUsed) {
       // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
       for (Bird splitBird : splitBirds) {
-        splitBird.display(); // Anzeige der kleineren Vögel
+        splitBird.display(Speed); // Anzeige der kleineren Vögel
       }
       return;
     }
 
     drawTrail();
 
-    if (isFlying) {
-      lifeTime -= 0.05;
+    if (isFlying && Speed < 20) {
+      lifeTime -= 0.25;
       activateAbility();
     }
 
     if (lifeTime <= 0) {
       body.setLinearVelocity(new Vec2(0, 0));
       body.setAngularVelocity(0);
-      isFlying = false;
-      isDragging = false;
+      bird.resetBird();
       return;
     }
 
@@ -298,22 +297,21 @@ class Bird {
     }
   }
   void activateTargetKin(PVector rightHand) {
-    if (isAbility == true) {
+    if (AbilityUsed != true) {
+      println("Target");
+      AbilityUsed = true;
       println(rightHand);
       PVector birdPos = getPixelPosition();
       direction = new PVector(rightHand.x-birdPos.x, rightHand.y-birdPos.y);  // Handposition
       direction.normalize();
 
-      isAbility = false;  // Setze die Fähigkeit zurück
-      isAbilityLock = true;
+
+      AbilityUsed = true;
       float speed = 1000;  // Geschwindigkeit des Vogels
       Vec2 velocity = box2d.vectorPixelsToWorld(new Vec2(direction.x * speed, direction.y * speed));
 
       // Setze die Geschwindigkeit des Vogels in Richtung der Maus
       body.setLinearVelocity(velocity);
-      //body.setAngularVelocity(1);  // Wenn der Vogel sich drehen soll, behalte dies bei
-      //birdsize *=2;
-      //radius.x *=4;
       isFlying = true;
       isDragging = false;
       return;
