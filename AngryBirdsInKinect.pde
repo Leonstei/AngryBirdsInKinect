@@ -27,6 +27,15 @@ Bird bird;
 float groundHeight = height - 10,releaseHight = 100;
 ArrayList<Button> buttons;
 
+
+//Score System
+int score = 0; // Gesamtpunktzahl
+int shotsFired = 0; // Anzahl der Schüsse
+boolean gameWon = false; // Gibt an, ob das Spiel gewonnen wurde
+boolean bonusAwarded = false; // Neue Variable, um Bonuspunkte zu tracken
+
+
+
 void setup() {
   //// Kinect-Einstellungen
   //kinect = new SimpleOpenNI(this);
@@ -155,10 +164,25 @@ void draw() {
   
   // Turm anzeigen
   tower.display();
+  
+  // Punktestand anzeigen
+    displayScore();
+    displayShotsFired();
+
+    // Prüfen, ob alle Gegner tot sind
+    if (enemy.allEnemiesDefeated()) {
+        gameWon = true;
+    }
+    
+    // Win-Screen überlagern, falls das Spiel gewonnen wurde
+    if (gameWon) {
+        displayWinScreen(); // Win-Screen in der Mitte
+    }
 
     PVector birdPos = bird.getPixelPosition();
     float birdRadius = bird.getRadius();
-
+    Vec2 velocity = bird.body.getLinearVelocity(); //  Geschwindigkeit des Vogels
+    float birdSpeed = velocity.length(); // Betrag des Geschwindigkeitsvektors
     enemy.display();
     enemy.checkForBirdCollision(birdPos, birdRadius);
     enemy.checkForImpact(tower.getBlocks());
@@ -265,6 +289,47 @@ void keyPressed() {
     }  else if (key == 's' && bird.isFlying) {
     bird.activateSplitMode();
   }
+}
 
 
+void displayScore() {
+    fill(255);
+    textSize(24);
+    text("Score: " + score, 50, 50);
+}
+
+void displayShotsFired() {
+    fill(255);
+    textSize(24);
+    text("Shots: " + shotsFired, 50, 80);
+}
+
+void displayWinScreen() {
+    // Bonuspunkte nur einmal vergeben, wenn das Spiel gewonnen wurde
+    if (gameWon && !bonusAwarded) {
+        if (shotsFired == 1) {
+            score += 300; // Bonus für einen Schuss
+        } else if (shotsFired == 2) {
+            score += 200; // Bonus für zwei Schüsse
+        } else if (shotsFired == 3) {
+            score += 100; // Bonus für drei Schüsse
+        }
+        bonusAwarded = true; // Bonus wurde vergeben
+    }
+
+    // Halbtransparenter Hintergrund
+    fill(0, 150);
+    rectMode(CENTER);
+    rect(width / 2, height / 2, 400, 200);
+
+    // Textanzeige
+    textAlign(CENTER);
+    textSize(36);
+    fill(255, 255, 0);
+    text("You Win!", width / 2, height / 2 - 40);
+    text("Score: " + score, width / 2, height / 2);
+    text("Shots Used: " + shotsFired, width / 2, height / 2 + 40);
+    textSize(16);
+    fill(255);
+    text("Press 1, 2, or 3 to load a new level", width / 2, height / 2 + 80);
 }

@@ -118,11 +118,24 @@ class Enemy {
         }
     }
 
-    void killEnemy(int index) {
-        if (index >= 0 && index < enemies.size() && alive.get(index)) {
-            Body enemy = enemies.get(index);
-            alive.set(index, false);
-            box2d.destroyBody(enemy);
-        }
-    }
+    boolean allEnemiesDefeated() {
+      for (boolean aliveState : alive) {
+          if (aliveState) {
+              return false; // Es gibt noch lebende Gegner
+          }
+      }
+      return true; // Alle Gegner sind tot
+  }
+
+  void killEnemy(int index) {
+      if (index >= 0 && index < enemies.size() && alive.get(index)) {
+          Body enemy = enemies.get(index);
+          alive.set(index, false);
+          box2d.destroyBody(enemy);
+  
+          // Punkte für das Töten des Gegners vergeben
+          score += 100; // 100 Punkte pro Gegner
+          println("Enemy killed! Score: " + score);
+      }
+  }
 }

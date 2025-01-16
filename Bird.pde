@@ -12,11 +12,15 @@ class Bird {
   boolean isFlying = false; // Gibt an, ob der Vogel fliegt
   boolean isDragging = false; // Gibt an, ob der Vogel gezogen wird
   ArrayList<PVector> trail=new ArrayList<PVector>();
+<<<<<<< HEAD
   //boolean heavyModeUsed = false; // Neue Variable: Fähigkeit bereits verwendet
   //boolean splitModeUsed = false; // Track if split mode has been used
   boolean isAbility = false;
   boolean isAbilityLock = false;
   boolean isDirectionSet = false;
+=======
+  boolean AbilityUsed = false; // Neue Variable: Fähigkeit bereits verwendet
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
   ArrayList<Bird> splitBirds = new ArrayList<>();
 
 
@@ -97,29 +101,32 @@ class Bird {
 
   void releaseWithPower() {
     if (isDragging) {
-      trail.clear();
-      isDragging = false;
+        trail.clear();
+        isDragging = false;
 
-      // Calculate the release velocity based on stretch
-      float power = 7.5f; // Strength multiplier for release
-      PVector stretch = PVector.sub(getPixelPosition(), slingshotOrigin);
-      Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(-stretch.x * power, -stretch.y * power));
+        // Schusszählung
+        shotsFired++;
 
-      // Set body type to DYNAMIC so it can be affected by physics
-      body.setType(BodyType.DYNAMIC);
+        float power = 7.5f; // Stärke
+        PVector stretch = PVector.sub(getPixelPosition(), slingshotOrigin);
+        Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(-stretch.x * power, -stretch.y * power));
 
-      // Apply the calculated release velocity to the bird
-      body.setLinearVelocity(releaseVelocity);
+        body.setType(BodyType.DYNAMIC);
+        body.setLinearVelocity(releaseVelocity);
 
-      // Transition state to flying
-      isFlying = true;
+        isFlying = true;
     }
   }
   void addMass(){
     this.radius = this.radius *2;
   }
 
+<<<<<<< HEAD
   void resetBird() {
+=======
+
+void resetBird() {
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
     // Entferne alle Vogelkörper (inklusive Split-Birds und eventuelle Überbleibsel)
     for (Bird splitBird : splitBirds) {
       if (splitBird.body != null) {
@@ -144,8 +151,12 @@ class Bird {
     isAbility = false;
     isAbilityLock = false;
     lifeTime = 20;
+<<<<<<< HEAD
     //isAbilityLock = false;
     //heavyModeUsed = false;
+=======
+    AbilityUsed = false;
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
 
     // Lösche den Trail
     trail.clear();
@@ -158,6 +169,7 @@ class Bird {
 
 
 
+<<<<<<< HEAD
   void display() {
     if (!isFlying && isAbilityLock) {
       // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
@@ -165,6 +177,15 @@ class Bird {
         splitBird.display(); // Anzeige der kleineren Vögel
       }
       return;
+=======
+void display() {
+    if (!isFlying && AbilityUsed) {
+        // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
+        for (Bird splitBird : splitBirds) {
+            splitBird.display(); // Anzeige der kleineren Vögel
+        }
+        return;
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
     }
 
     drawTrail();
@@ -216,25 +237,43 @@ class Bird {
 
   //Fähigeit Heavy Mode
   void activateHeavyMode() {
+<<<<<<< HEAD
     if (isFlying && !isAbilityLock) {
       // Erhöhe Größe und Masse des Vogels
       radius *= 1.3;
       updateBodyMass(15);
+=======
+    if (isFlying && !AbilityUsed) {
+        // Erhöhe Größe und Masse des Vogels
+        radius *= 1.3;
+        updateBodyMass(15);
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
 
       // Setze eine starke vertikale Geschwindigkeit
       body.setLinearVelocity(new Vec2(body.getLinearVelocity().x, -35));
 
+<<<<<<< HEAD
       // Markiere Fähigkeit als verwendet
       isAbilityLock = true;
+=======
+        // Markiere Fähigkeit als verwendet
+        AbilityUsed = true;
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
 
       // Visual Feedback
       println("Heavy mode activated: Increased size and downward velocity!");
     }
   }
 
+<<<<<<< HEAD
   void activateSplitMode() {
     if (isFlying && !isAbilityLock) {
       isAbilityLock = true;
+=======
+void activateSplitMode() {
+    if (isFlying && !AbilityUsed) {
+        AbilityUsed = true;
+>>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
 
       // Holen Sie die aktuelle Position und Geschwindigkeit des Vogels
       PVector currentPosition = getPixelPosition();
