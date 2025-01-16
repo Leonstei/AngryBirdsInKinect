@@ -22,11 +22,7 @@ void drawHands() {
 
     if (kinect.isTrackingSkeleton(userId)) {
       //drawSkeleton(userId);
-<<<<<<< HEAD
-      drawOneHand(userId, SimpleOpenNI.SKEL_RIGHT_HAND);
-      drawOneHand(userId, SimpleOpenNI.SKEL_LEFT_HAND);
-      //Fähigkeit Downwards
-=======
+
       drawOneHand(userId,SimpleOpenNI.SKEL_RIGHT_HAND);
       drawOneHand(userId,SimpleOpenNI.SKEL_LEFT_HAND);
        //Fähigkeit Downwards
@@ -35,10 +31,9 @@ void drawHands() {
     }     if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1800 && bird.isFlying) {
     bird.activateSplitMode();
 }
->>>>>>> bdcf2ab7e6b1d891dc0e5c0ad7661c29df44a055
     }
   }
-}
+
 
 
 
@@ -127,7 +122,6 @@ void activateAbility() {
 
       if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200) {
         println("activate Ability");
-        bird.isAbility = true;
         bird.activateTargetKin(rightHand);
       }
     }
