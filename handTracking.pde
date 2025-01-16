@@ -181,6 +181,11 @@ void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
   //println("Geste erkannt: " + gestureType + ", Position: " + pos);
   if (gestureType == 1) {
     println(SimpleOpenNI.GESTURE_CLICK);
+    if(bird.isFlying){
+      PVector screenPos = new PVector();
+      kinect.convertRealWorldToProjective(pos, screenPos);
+      bird.setVelocityTowards(screenPos);
+    }
   }
   // Starte Hand-Tracking
   int handId = kinect.startTrackingHand(pos);

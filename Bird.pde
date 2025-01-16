@@ -15,6 +15,9 @@ class Bird {
 
   boolean AbilityUsed = false; // Neue Variable: Fähigkeit bereits verwendet
   ArrayList<Bird> splitBirds = new ArrayList<>();
+  boolean isAbility = false;
+  boolean isAbilityLock = false;
+  boolean isDirectionSet = false;
 
 
   Bird(Box2DProcessing box2d, PVector slingshotOrigin) {
@@ -94,29 +97,29 @@ class Bird {
 
   void releaseWithPower() {
     if (isDragging) {
-        trail.clear();
-        isDragging = false;
+      trail.clear();
+      isDragging = false;
 
-        // Schusszählung
-        shotsFired++;
+      // Schusszählung
+      shotsFired++;
 
-        float power = 7.5f; // Stärke
-        PVector stretch = PVector.sub(getPixelPosition(), slingshotOrigin);
-        Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(-stretch.x * power, -stretch.y * power));
+      float power = 7.5f; // Stärke
+      PVector stretch = PVector.sub(getPixelPosition(), slingshotOrigin);
+      Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(-stretch.x * power, -stretch.y * power));
 
-        body.setType(BodyType.DYNAMIC);
-        body.setLinearVelocity(releaseVelocity);
+      body.setType(BodyType.DYNAMIC);
+      body.setLinearVelocity(releaseVelocity);
 
-        isFlying = true;
+      isFlying = true;
     }
   }
-  void addMass(){
+  void addMass() {
     this.radius = this.radius *2;
   }
 
 
 
-void resetBird() {
+  void resetBird() {
     // Entferne alle Vogelkörper (inklusive Split-Birds und eventuelle Überbleibsel)
     for (Bird splitBird : splitBirds) {
       if (splitBird.body != null) {
@@ -156,13 +159,13 @@ void resetBird() {
 
 
 
-void display() {
+  void display() {
     if (!isFlying && AbilityUsed) {
-        // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
-        for (Bird splitBird : splitBirds) {
-            splitBird.display(); // Anzeige der kleineren Vögel
-        }
-        return;
+      // Hauptvogel wird nicht mehr angezeigt, wenn der Split-Modus verwendet wurde
+      for (Bird splitBird : splitBirds) {
+        splitBird.display(); // Anzeige der kleineren Vögel
+      }
+      return;
     }
 
     drawTrail();
@@ -170,7 +173,6 @@ void display() {
     if (isFlying) {
       lifeTime -= 0.05;
       activateAbility();
-
     }
 
     if (lifeTime <= 0) {
@@ -216,16 +218,16 @@ void display() {
   void activateHeavyMode() {
 
     if (isFlying && !AbilityUsed) {
-        // Erhöhe Größe und Masse des Vogels
-        radius *= 1.3;
-        updateBodyMass(15);
+      // Erhöhe Größe und Masse des Vogels
+      radius *= 1.3;
+      updateBodyMass(15);
 
       // Setze eine starke vertikale Geschwindigkeit
       body.setLinearVelocity(new Vec2(body.getLinearVelocity().x, -35));
 
 
-        // Markiere Fähigkeit als verwendet
-        AbilityUsed = true;
+      // Markiere Fähigkeit als verwendet
+      AbilityUsed = true;
 
       // Visual Feedback
       println("Heavy mode activated: Increased size and downward velocity!");
@@ -233,9 +235,9 @@ void display() {
   }
 
 
-void activateSplitMode() {
+  void activateSplitMode() {
     if (isFlying && !AbilityUsed) {
-        AbilityUsed = true;
+      AbilityUsed = true;
 
       // Holen Sie die aktuelle Position und Geschwindigkeit des Vogels
       PVector currentPosition = getPixelPosition();
@@ -295,7 +297,7 @@ void activateSplitMode() {
       return;
     }
   }
-    void activateTargetKin(PVector rightHand) {
+  void activateTargetKin(PVector rightHand) {
     if (isAbility == true) {
       println(rightHand);
       PVector birdPos = getPixelPosition();
@@ -317,6 +319,27 @@ void activateSplitMode() {
       return;
     }
   }
+
+  void setVelocityTowards(PVector target) {
+    // Berechne den Richtungsvektor vom Vogel zur Zielposition
+    PVector direction = PVector.sub(target, birdPosition);
+
+    // Normalisiere den Richtungsvektor, um nur die Richtung beizubehalten
+    direction.normalize();
+
+    // Wähle eine Geschwindigkeit (du kannst diesen Wert anpassen)
+    float speed = 10;
+
+    // Skaliere den Richtungsvektor mit der gewünschten Geschwindigkeit
+    direction.mult(speed);
+
+    // Setze die Geschwindigkeit des Box2D-Körpers
+    body.setLinearVelocity(new Vec2(direction.x, direction.y));
+
+    // Aktualisiere die Flug-Status-Variable
+    isFlying = true;
+  }
+
 
 
 
