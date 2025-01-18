@@ -4,6 +4,8 @@ import shiffman.box2d.*;
 import org.jbox2d.collision.shapes.*;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
+import ddf.minim.*;
+
 
 SimpleOpenNI kinect;
 Box2DProcessing box2d;
@@ -33,6 +35,11 @@ int score = 0; // Gesamtpunktzahl
 int shotsFired = 0; // Anzahl der Schüsse
 boolean gameWon = false; // Gibt an, ob das Spiel gewonnen wurde
 boolean bonusAwarded = false; // Neue Variable, um Bonuspunkte zu tracken
+
+  Minim minim; // Minim-Objekt für die Audiowiedergabe
+  AudioPlayer backgroundMusic; // AudioPlayer für die Hintergrundmusik
+  AudioSample collisionSound; // Sound für Kollision
+  AudioSample enemyDeathSound; // Sound für das Sterben eines Gegners
 
 
 
@@ -66,8 +73,22 @@ void setup() {
   buttons.add(new Button(new PVector(350, 10), new PVector(200, 200), buttonTwoNormal, buttonTwoHover)); // Button 2
   buttons.add(new Button(new PVector(600, 10), new PVector(200, 200), buttonThreeNormal, buttonThreeHover)); // Button 3
   buttons.add(new Button(new PVector(850, 10), new PVector(200, 200), resetNormal, resetHover)); // Reset Button
+    //Game Music
 
 
+   minim = new Minim(this);
+   backgroundMusic = minim.loadFile("background.mp3"); //https://pixabay.com/music/main-title-friendly-town-fun-video-game-music-loop-256055/ 
+    // Soundeffekte laden (Dateien im 'data'-Ordner platzieren)
+    collisionSound = minim.loadSample("collision.mp3", 512); // https://pixabay.com/sound-effects/wood-block-105066/
+    enemyDeathSound = minim.loadSample("enemy_death.mp3", 512); // https://pixabay.com/sound-effects/puffofsmoke-47176/
+
+
+   // Musik abspielen und auf Wiederholung setzen
+   backgroundMusic.loop();
+   
+   // Setze die Lautstärke
+    backgroundMusic.setGain(-15);
+   
 
   // Hände initialisieren
   rightHand = new PVector(0, 0);
@@ -112,6 +133,8 @@ void setup() {
 
   // Lade Level 1 standardmäßig
   level.loadLevel(1);
+  
+
 
 
   //Assets zu Gegner und Türmen hinzufügen

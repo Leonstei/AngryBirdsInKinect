@@ -132,7 +132,8 @@ class Enemy {
           Body enemy = enemies.get(index);
           alive.set(index, false);
           box2d.destroyBody(enemy);
-  
+          enemyDeathSound.trigger(); // Kollision-Sound abspielen
+
           // Punkte für das Töten des Gegners vergeben
           score += 100; // 100 Punkte pro Gegner
           println("Enemy killed! Score: " + score);
