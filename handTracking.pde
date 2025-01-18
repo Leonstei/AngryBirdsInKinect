@@ -17,6 +17,8 @@ void drawHands() {
   //if(trackedHands.size()==0)return;
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
+  
+  float thresholdY = 300;
   if (userList.size() > 0) {
     int userId = userList.get(0);
 
@@ -27,13 +29,13 @@ void drawHands() {
       drawOneHand(userId, SimpleOpenNI.SKEL_LEFT_HAND);
       //Fähigkeit Downwards
     }
-    if (rightHand.y - leftHand.y > 100 && bird.isFlying) { //Wenn die rechte Hand tiefer als die linke Hand ist
+    if (rightHand.y > thresholdY && leftHand.y > thresholdY && bird.isFlying) {
       bird.activateHeavyMode();
     }
-    if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1500 && bird.isFlying) {
+    if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) < 200 && bird.isFlying) {
       bird.activateSplitMode();
     }
-    if (leftHand.y < 500 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
+    if (leftHand.y < 100 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
  
       bird.activateTargetKin(rightHand);
       
