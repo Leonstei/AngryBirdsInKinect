@@ -44,11 +44,6 @@ boolean bonusAwarded = false; // Neue Variable, um Bonuspunkte zu tracken
 
 
 void setup() {
-  //// Kinect-Einstellungen
-  //kinect = new SimpleOpenNI(this);
-  //kinect.enableDepth();
-  //kinect.enableUser();
-  //kinect.setMirror(true);
   setupKinect();
 
   //Fenster Setup
@@ -285,7 +280,7 @@ void drawJoint(int userId, int jointId) {
 
 void mousePressed() {
   bird.handleMousePressed(mouseX, mouseY); // Maus-Interaktion an Vogel delegieren
-  if (bird.isFlying) {
+  if (!bird.AbilityUsed && bird.isFlying) {
     bird.activateTarget();
   }
 }

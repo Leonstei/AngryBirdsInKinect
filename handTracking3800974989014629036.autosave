@@ -30,7 +30,7 @@ void drawHands() {
     if (rightHand.y - leftHand.y > 100 && bird.isFlying) { //Wenn die rechte Hand tiefer als die linke Hand ist
       bird.activateHeavyMode();
     }
-    if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1500 && bird.isFlying) {
+    if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1700 && bird.isFlying) {
       bird.activateSplitMode();
     }
     if (leftHand.y < 500 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird

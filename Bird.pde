@@ -15,8 +15,6 @@ class Bird {
 
   boolean AbilityUsed = false; // Neue Variable: Fähigkeit bereits verwendet
   ArrayList<Bird> splitBirds = new ArrayList<>();
-  boolean isAbility = false;
-  boolean isAbilityLock = false;
   boolean isDirectionSet = false;
 
 
@@ -75,8 +73,8 @@ class Bird {
       isDragging = true;
       body.setLinearVelocity(new Vec2(0, 0)); // Stop any movement
     }
-    if (dist(mouseX, mouseY, pos.x, pos.y) > radius && isFlying && mouseButton == LEFT && isAbilityLock == false) {
-      isAbility = true;
+    if (dist(mouseX, mouseY, pos.x, pos.y) > radius && isFlying && mouseButton == LEFT && !AbilityUsed) {
+      AbilityUsed = true;
     }
   }
 
@@ -141,12 +139,9 @@ class Bird {
     updateBodyMass(5); // Ursprüngliches Gewicht
     isFlying = false;
     isDragging = false;
-    isAbility = false;
-    isAbilityLock = false;
-    lifeTime = 20;
-
     AbilityUsed = false;
-
+    lifeTime = 20;
+    
     // Lösche den Trail
     trail.clear();
 
@@ -271,13 +266,12 @@ class Bird {
     }
   }
   void activateTarget() {
-    if (isAbility == true) {
+    if (isFlying && !AbilityUsed) {
       PVector birdPos = getPixelPosition();
       direction = new PVector(mouseX-birdPos.x, mouseY-birdPos.y);  // Mausposition
       direction.normalize();
 
-      isAbility = false;  // Setze die Fähigkeit zurück
-      isAbilityLock = true;
+      AbilityUsed = false;  // Setze die Fähigkeit zurück
       float speed = 1000;  // Geschwindigkeit des Vogels
       Vec2 velocity = box2d.vectorPixelsToWorld(new Vec2(direction.x * speed, direction.y * speed));
 
@@ -292,7 +286,7 @@ class Bird {
     }
   }
   void activateTargetKin(PVector rightHand) {
-    if (AbilityUsed != true) {
+    if (isFlying && !AbilityUsed) {
       println("Target");
       AbilityUsed = true;
       println(rightHand);
@@ -300,8 +294,6 @@ class Bird {
       direction = new PVector(rightHand.x-birdPos.x, rightHand.y-birdPos.y);  // Handposition
       direction.normalize();
 
-
-      AbilityUsed = true;
       float speed = 1000;  // Geschwindigkeit des Vogels
       Vec2 velocity = box2d.vectorPixelsToWorld(new Vec2(direction.x * speed, direction.y * speed));
 
