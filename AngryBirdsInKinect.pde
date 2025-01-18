@@ -79,8 +79,8 @@ void setup() {
    minim = new Minim(this);
    backgroundMusic = minim.loadFile("background.mp3"); //https://pixabay.com/music/main-title-friendly-town-fun-video-game-music-loop-256055/ 
     // Soundeffekte laden (Dateien im 'data'-Ordner platzieren)
-    collisionSound = minim.loadSample("collision.mp3", 512); // https://pixabay.com/sound-effects/wood-block-105066/
-    enemyDeathSound = minim.loadSample("enemy_death.mp3", 512); // https://pixabay.com/sound-effects/puffofsmoke-47176/
+   collisionSound = minim.loadSample("collision.mp3", 512); // https://pixabay.com/sound-effects/wood-block-105066/
+   enemyDeathSound = minim.loadSample("enemy_death.mp3", 512); // https://pixabay.com/sound-effects/puffofsmoke-47176/
 
 
    // Musik abspielen und auf Wiederholung setzen

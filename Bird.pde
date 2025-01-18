@@ -170,11 +170,6 @@ class Bird {
 
     drawTrail();
 
-    if (isFlying && Speed < 20) {
-      lifeTime -= 0.25;
-      activateAbility();
-    }
-
     if (lifeTime <= 0) {
       body.setLinearVelocity(new Vec2(0, 0));
       body.setAngularVelocity(0);

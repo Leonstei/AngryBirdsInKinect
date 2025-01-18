@@ -92,47 +92,6 @@ void drawOneHand(int userId, int jointId) {
   }
 }
 
-void activateAbility() {
-  IntVector userList = new IntVector();
-  kinect.getUsers(userList);
-  if (userList.size() > 0) {
-    int userId = userList.get(0);
-
-    if (kinect.isTrackingSkeleton(userId)) {
-      PVector leftShoulder = new PVector();
-      kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, leftShoulder);
-      kinect.convertRealWorldToProjective(leftShoulder, leftShoulder);
-      PVector rightShoulder = new PVector();
-      kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, rightShoulder);
-      kinect.convertRealWorldToProjective(rightShoulder, rightShoulder);
-
-      leftShoulder.y = map(leftShoulder.y, 0, 480, -240, 1680);
-      rightShoulder.y = map(rightShoulder.y, 0, 480, -240, 1680);
-
-      //println("leftshouldery = " + leftShoulder.y  + " left = " + leftHand.y);
-      //if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
-      //  println("actitivate Ability");
-      //  bird.activateSplitMode();
-      //}
-
-      // if(abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200){
-      //  println("actitivate Ability");
-      //  bird.activateHeavyMode();
-      //}
-      //if (rightHand.y - leftHand.y > 100 && bird.isFlying) {
-      //  bird.activateHeavyMode();
-      //}
-      //if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) > 1500 && bird.isFlying && !bird.isAbilityLock) {
-      //  bird.activateSplitMode();
-      //}
-
-      if (abs(leftShoulder.y-leftHand.y) + abs(rightShoulder.y - rightHand.y ) <200) {
-        println("activate Ability");
-        bird.activateTargetKin(rightHand);
-      }
-    }
-  }
-}
 
 
 
