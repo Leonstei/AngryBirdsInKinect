@@ -14,35 +14,90 @@ void setupKinect() {
 
 
 void drawHands() {
-  //if(trackedHands.size()==0)return;
-  IntVector userList = new IntVector();
-  kinect.getUsers(userList);
-  
-  float thresholdY = 300;
-  if (userList.size() > 0) {
-    int userId = userList.get(0);
+  if (trackedHands.size()==0)return;
+  for (HashMap.Entry<Integer, PVector> entry : trackedHands.entrySet()) {
+    int handId = entry.getKey();
+    PVector handPos = entry.getValue();
 
-    if (kinect.isTrackingSkeleton(userId)) {
-      //drawSkeleton(userId);
+    handPos.x = map(handPos.x, 0, 640, -420, 2160);
+    handPos.y = map(handPos.y, 0, 480, -240, 1680);
 
-      drawOneHand(userId, SimpleOpenNI.SKEL_RIGHT_HAND);
-      drawOneHand(userId, SimpleOpenNI.SKEL_LEFT_HAND);
-      //Fähigkeit Downwards
+    decideIfRightOrLeft(handPos);
+
+    if (dist(handPos.x, handPos.y, bird.birdPosition.x, bird.birdPosition.y) < 30 && !bird.isFlying) {
+      count++;
     }
-    if (rightHand.y > thresholdY && leftHand.y > thresholdY && bird.isFlying) {
-      bird.activateHeavyMode();
+
+    if (count > 20 && dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100) {
+      bird.isDragging = true;
+      bird.startDragging(leftHand.x, leftHand.y); // Wenn Hände sich senken, wird der Vogel losgelassen
+      if ( rightHand.y < 50 ) {
+        count = 0;
+        bird.releaseWithPower();
+      }
     }
-    if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) < 200 && bird.isFlying) {
-      bird.activateSplitMode();
+    if (trackedHands.size() == 1) {
+      if (handPos.x < width/2) {
+        drawLeftHand();
+      } else {
+        drawRightHand();
+      }
+    } else {
+      drawRightHand();
+      drawLeftHand();
     }
-    if (leftHand.y < 100 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
- 
-      bird.activateTargetKin(rightHand);
-      
-    }
+  }
+  activateAbility();
+}
+
+void drawRightHand() {
+  image(rightHandOpen, rightHand.x - 50, rightHand.y - 50, 100, 100);
+}
+
+void drawLeftHand() {
+  if (count > 20) {
+    image(handClosed, leftHand.x - 50, leftHand.y - 50, 100, 100);
+  } else {
+    image(leftHandOpen, leftHand.x - 50, leftHand.y - 50, 100, 100);
   }
 }
 
+
+void activateAbility() {
+  float thresholdY = 300;
+  if (rightHand.y > thresholdY && leftHand.y > thresholdY && bird.isFlying) {
+    bird.activateHeavyMode();
+  }
+  if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) < 200 && bird.isFlying) {
+    bird.activateSplitMode();
+  }
+  if (leftHand.y < 100 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
+    bird.activateTargetKin(rightHand);
+  }
+}
+
+void decideIfRightOrLeft(PVector handPos) {
+  if (
+    dist(handPos.x, handPos.y, leftHand.x, leftHand.y) < 100 &&
+    dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) >100
+    ) {
+    smoothHandWithSpeed(handPos, leftHand, leftHand);
+    println(leftHand);
+    //leftHand.set(handPos.x, handPos.y);
+  } else if (
+    dist(handPos.x, handPos.y, rightHand.x, rightHand.y) < 100 &&
+    dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) > 100
+    ) {
+    smoothHandWithSpeed(handPos, rightHand, rightHand);
+    //rightHand.set(handPos.x, handPos.y);
+  } else {
+    if (handPos.x >= width / 2) {
+      rightHand.set(handPos.x, handPos.y);
+    } else {
+      leftHand.set(handPos.x, handPos.y);
+    }
+  }
+}
 
 
 
