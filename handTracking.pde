@@ -64,14 +64,15 @@ void drawLeftHand() {
 
 
 void activateAbility() {
-  float thresholdY = 300;
+  float thresholdY = 800;
+  line(0, thresholdY, width, thresholdY);
   if (rightHand.y > thresholdY && leftHand.y > thresholdY && bird.isFlying) {
     bird.activateHeavyMode();
   }
   if (dist(rightHand.x, rightHand.y, leftHand.x, leftHand.y) < 200 && bird.isFlying) {
     bird.activateSplitMode();
   }
-  if (leftHand.y < 100 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
+  if (leftHand.y < 200 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
     bird.activateTargetKin(rightHand);
   }
 }
@@ -82,7 +83,7 @@ void decideIfRightOrLeft(PVector handPos) {
     dist(leftHand.x, leftHand.y, rightHand.x, rightHand.y) >100
     ) {
     smoothHandWithSpeed(handPos, leftHand, leftHand);
-    println(leftHand);
+    //println(leftHand);
     //leftHand.set(handPos.x, handPos.y);
   } else if (
     dist(handPos.x, handPos.y, rightHand.x, rightHand.y) < 100 &&
@@ -168,20 +169,7 @@ void updateHandPositionWithDeadband(PVector newPos, PVector oldPos, PVector smoo
   }
 }
 
-//if(
-//  leftHand.x != 0 && leftHand.y != 0 &&
-//  rightHand.x != 0 && rightHand.y != 0 &&
-//  dist(handPos.x, handPos.y, leftHand.x, leftHand.y) <
-//  dist(handPos.x, handPos.y, rightHand.x, rightHand.y)
 
-//  ){
-//    leftHand.set(handPos.x, handPos.y);
-//  }else if(
-//  rightHand.x != 0 && rightHand.y != 0 &&
-//  leftHand.x != 0 && leftHand.y != 0 &&
-//    dist(handPos.x, handPos.y, rightHand.x, rightHand.y) <
-//    dist(handPos.x, handPos.y, leftHand.x, leftHand.y)
-//  )
 
 
 void onNewUser(SimpleOpenNI kinect, int userID) {
@@ -204,9 +192,7 @@ void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
   if (gestureType == 1) {
     println(SimpleOpenNI.GESTURE_CLICK);
     if (bird.isFlying) {
-      PVector screenPos = new PVector();
-      kinect.convertRealWorldToProjective(pos, screenPos);
-      bird.setVelocityTowards(screenPos);
+      bird.activateTargetKin(rightHand);
     }
   }
   // Starte Hand-Tracking

@@ -138,10 +138,11 @@ void setup() {
 }
 
 void draw() {
-  // Kinect-Update
-  if (frameCount%2 == 0) {
-    kinect.update();
-  }
+  // Kinect-Updates
+  //if (frameCount%2 == 0) {
+  //  kinect.update();
+  //}
+  kinect.update();
   Vec2 velocity = bird.body.getLinearVelocity(); //  Geschwindigkeit des Vogels
   float birdSpeed = velocity.length(); // Betrag des Geschwindigkeitsvektors
   box2d.step();
