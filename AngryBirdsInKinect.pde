@@ -82,7 +82,7 @@ void setup() {
    backgroundMusic.loop();
    
    // Setze die Lautstärke
-    backgroundMusic.setGain(-15);
+    backgroundMusic.setGain(-25);
    
 
   // Hände initialisieren

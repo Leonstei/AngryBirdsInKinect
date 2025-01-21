@@ -102,8 +102,9 @@ class Bird {
       shotsFired++;
 
       float power = 7.5f; // Stärke
-      PVector stretch = PVector.sub(getPixelPosition(), slingshotOrigin);
-      Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(-stretch.x * power, -stretch.y * power));
+      
+      PVector stretch = PVector.sub(slingshotOrigin, getPixelPosition());
+      Vec2 releaseVelocity = box2d.vectorPixelsToWorld(new Vec2(stretch.x * power, stretch.y * power));
 
       body.setType(BodyType.DYNAMIC);
       body.setLinearVelocity(releaseVelocity);
@@ -214,7 +215,6 @@ class Bird {
       // Setze eine starke vertikale Geschwindigkeit
       body.setLinearVelocity(new Vec2(body.getLinearVelocity().x, -35));
 
-
       // Markiere Fähigkeit als verwendet
       AbilityUsed = true;
 
@@ -233,12 +233,12 @@ class Bird {
       Vec2 currentVelocity = body.getLinearVelocity();
 
       // Winkel für die kleinen Vögel
-      float angleOffset = PI / 8; // Unterschied in Flugbahnen
+      float angleOffset = PI / 16; // Unterschied in Flugbahnen
 
       // Erstellen der drei neuen Vögel
       for (int i = -1; i <= 1; i++) {
         Bird splitBird = new Bird(box2d, slingshotOrigin);
-        splitBird.radius = this.radius * 0.8f; // Kleinere Vögel
+        splitBird.radius = this.radius * 0.7f; // Kleinere Vögel
         splitBird.lifeTime = this.lifeTime / 2; // Kürzere Lebensdauer
         splitBird.makeBody(currentPosition.x, currentPosition.y);
 
@@ -285,11 +285,9 @@ class Bird {
       return;
     }
   }
-  void activateTargetKin(PVector rightHand) {
+  void activateTargetKin2(PVector rightHand) {
     if (isFlying && !AbilityUsed) {
-      println("Target");
       AbilityUsed = true;
-      println(rightHand);
       PVector birdPos = getPixelPosition();
       direction = new PVector(rightHand.x-birdPos.x, rightHand.y-birdPos.y);  // Handposition
       direction.normalize();
@@ -304,31 +302,6 @@ class Bird {
       return;
     }
   }
-
-  void setVelocityTowards(PVector target) {
-    // Berechne den Richtungsvektor vom Vogel zur Zielposition
-    PVector direction = PVector.sub(target, birdPosition);
-
-    // Normalisiere den Richtungsvektor, um nur die Richtung beizubehalten
-    direction.normalize();
-
-    // Wähle eine Geschwindigkeit (du kannst diesen Wert anpassen)
-    float speed = 10;
-
-    // Skaliere den Richtungsvektor mit der gewünschten Geschwindigkeit
-    direction.mult(speed);
-
-    // Setze die Geschwindigkeit des Box2D-Körpers
-    body.setLinearVelocity(new Vec2(direction.x, direction.y));
-
-    // Aktualisiere die Flug-Status-Variable
-    isFlying = true;
-  }
-
-
-
-
-
 
 
   void updateBodyMass(float newDensity) {

@@ -62,10 +62,30 @@ void drawLeftHand() {
   }
 }
 
+void activateDashToRightHand(){
+  if (true) { //Wenn die linke Hand hochgehoben wird und Flying
+    bird.activateTargetKin2(rightHand);
+  }
+}
+
+void activateHavyAbility(){  
+  if (true) {// beide hände nach unten und Flying
+    bird.activateHeavyMode();
+  }
+}
+
+void activateSplitAbility(){
+  if (true) { // Hände nah zusammenbringen und Flying
+    bird.activateSplitMode();
+  }
+}
+
+
 
 void activateAbility() {
   float thresholdY = 800;
   line(0, thresholdY, width, thresholdY);
+  
   if (rightHand.y > thresholdY && leftHand.y > thresholdY && bird.isFlying) {
     bird.activateHeavyMode();
   }
@@ -73,7 +93,7 @@ void activateAbility() {
     bird.activateSplitMode();
   }
   if (leftHand.y < 200 && bird.isFlying) { //Wenn die linke Hand hochgehoben wird
-    bird.activateTargetKin(rightHand);
+    bird.activateTargetKin2(rightHand);
   }
 }
 
@@ -190,10 +210,8 @@ void onLostHand(SimpleOpenNI curContext, int handId) {
 void onCompletedGesture(SimpleOpenNI curContext, int gestureType, PVector pos) {
   //println("Geste erkannt: " + gestureType + ", Position: " + pos);
   if (gestureType == 1) {
-    println(SimpleOpenNI.GESTURE_CLICK);
-    if (bird.isFlying) {
-      bird.activateTargetKin(rightHand);
-    }
+    println(SimpleOpenNI.GESTURE_CLICK); // Click und Flying
+    
   }
   // Starte Hand-Tracking
   int handId = kinect.startTrackingHand(pos);
