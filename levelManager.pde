@@ -29,16 +29,6 @@ class Level {
                 tower.buildSimpleHouse(new PVector(800, height - 150), 40, 20);
                 tower.buildSimpleHouse(new PVector(800, height - 300), 40, 20);
                 tower.buildSimpleHouse(new PVector(800, height - 450), 40, 20);
-            
-                // Gegner für den zweiten Turm
-                enemy.addEnemy(1000, height - 55, 30);
-                enemy.addEnemy(1000, height - 200, 30);
-                enemy.addEnemy(1000, height - 330, 30);
-            
-                // Zweiter Turm
-                tower.buildSimpleHouse(new PVector(1000, height - 50), 40, 20);
-                tower.buildSimpleHouse(new PVector(1000, height - 150), 40, 20);
-                tower.buildSimpleHouse(new PVector(1000, height - 300), 40, 20);
                             break;
             case 2:
                 println("Loading Level 2");
@@ -84,31 +74,7 @@ class Level {
               tower.buildSimpleHouse(new PVector(1100, height - 50), 40, 20);
               tower.buildSimpleHouse(new PVector(1100, height - 150), 40, 20);
               tower.buildSimpleHouse(new PVector(1100, height - 300), 40, 20);
-              tower.buildSimpleHouse(new PVector(1100, height - 450), 40, 20);
-          
-              // Gegner für den dritten Turm
-              enemy.addEnemy(1300, height - 55, 30);
-              enemy.addEnemy(1300, height - 200, 30);
-              enemy.addEnemy(1300, height - 330, 30);
-          
-              // Dritter Turm
-              tower.buildSimpleHouse(new PVector(1300, height - 50), 40, 20);
-              tower.buildSimpleHouse(new PVector(1300, height - 150), 40, 20);
-              tower.buildSimpleHouse(new PVector(1300, height - 300), 40, 20);
-          
-              // Gegner für den vierten Turm
-              enemy.addEnemy(1500, height - 55, 30);
-              enemy.addEnemy(1500, height - 200, 30);
-              enemy.addEnemy(1500, height - 330, 30);
-              enemy.addEnemy(1500, height - 460, 50);
-              enemy.addEnemy(1500, height - 590, 30);
-          
-              // Vierter Turm
-              tower.buildSimpleHouse(new PVector(1500, height - 50), 40, 20);
-              tower.buildSimpleHouse(new PVector(1500, height - 150), 40, 20);
-              tower.buildSimpleHouse(new PVector(1500, height - 300), 40, 20);
-              tower.buildSimpleHouse(new PVector(1500, height - 450), 40, 20);
-              tower.buildSimpleHouse(new PVector(1500, height - 580), 40, 20);
+              tower.buildSimpleHouse(new PVector(1100, height - 450), 40, 20);        
 
                 break;
 

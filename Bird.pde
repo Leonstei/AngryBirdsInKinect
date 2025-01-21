@@ -241,7 +241,7 @@ class Bird {
         splitBird.makeBody(currentPosition.x, currentPosition.y);
 
         // Setzen der Masse der kleineren Vögel
-        splitBird.updateBodyMass(4f); // Weniger Masse für kleinere Vögel
+        splitBird.updateBodyMass(4.5f); // Weniger Masse für kleinere Vögel
 
         // Setzen der Geschwindigkeit für jeden Vogel
         float angle = atan2(currentVelocity.y, currentVelocity.x) + (i * angleOffset);

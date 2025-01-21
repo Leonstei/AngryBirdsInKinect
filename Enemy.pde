@@ -8,7 +8,7 @@ class Enemy {
     ArrayList<Float> radii;  // Liste der Radien der Gegner
     ArrayList<Boolean> alive; // Liste, ob ein Gegner noch lebt (true = lebt)
     PImage enemyImage; // Bild für die Gegner
-    float impactThreshold = 5.5f; // Schwelle für zu starken Treffer
+    float impactThreshold = 8f; // Schwelle für zu starken Treffer
 
     Enemy(Box2DProcessing box2d) {
         this.box2d = box2d;
@@ -95,28 +95,35 @@ class Enemy {
         }
     }
 
-    void checkForImpact(ArrayList<Body> towerBlocks) {
-        for (int i = 0; i < enemies.size(); i++) {
-            if (!alive.get(i)) continue;
+void checkForImpact(ArrayList<Body> towerBlocks) {
+    for (int i = 0; i < enemies.size(); i++) {
+        if (!alive.get(i)) continue;
 
-            Body enemy = enemies.get(i);
-            Vec2 velocity = enemy.getLinearVelocity();
-            float impactForce = velocity.length();
+        Body enemy = enemies.get(i);
 
-            for (Body towerBlock : towerBlocks) {
-                Vec2 towerPos = box2d.getBodyPixelCoord(towerBlock);
-                Vec2 enemyPos = box2d.getBodyPixelCoord(enemy);
+        // Get enemy's velocity and mass
+        Vec2 enemyVelocity = enemy.getLinearVelocity();
+        float enemyMass = enemy.getMass();
+        float kineticEnergy = 0.5f * enemyMass * enemyVelocity.lengthSquared(); // Kinetische Energie
 
-                if (dist(enemyPos.x, enemyPos.y, towerPos.x, towerPos.y) <= radii.get(i) + 20) {
-                    if (impactForce > impactThreshold) {
-                        println("Enemy " + i + " died due to strong Tower impact!");
-                        killEnemy(i);
-                        break;
-                    }
+        for (Body towerBlock : towerBlocks) {
+            // Check distance to see if the enemy is near a block
+            Vec2 towerPos = box2d.getBodyPixelCoord(towerBlock);
+            Vec2 enemyPos = box2d.getBodyPixelCoord(enemy);
+
+            // Check if the enemy is close enough to interact with the block
+            if (dist(enemyPos.x, enemyPos.y, towerPos.x, towerPos.y) <= radii.get(i) + 20) {
+                // Check collision energy threshold
+                if (kineticEnergy > impactThreshold * 1000) { // Adjust scaling factor as needed
+                    println("Enemy " + i + " died due to high kinetic energy!");
+                    killEnemy(i);
+                    break;
                 }
             }
         }
     }
+}
+
 
     boolean allEnemiesDefeated() {
       for (boolean aliveState : alive) {
