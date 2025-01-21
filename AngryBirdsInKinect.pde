@@ -317,14 +317,17 @@ void keyPressed() {
 void displayScore() {
   fill(255);
   textSize(24);
-  text("Score: " + score, 50, 50);
+  textAlign(RIGHT, TOP); // Text rechtsbündig ausrichten
+  text("Score: " + score, width - 20, 20); // Anzeige in der oberen rechten Ecke
 }
 
 void displayShotsFired() {
   fill(255);
   textSize(24);
-  text("Shots: " + shotsFired, 50, 80);
+  textAlign(RIGHT, TOP); // Text rechtsbündig ausrichten
+  text("Shots: " + shotsFired, width - 20, 50); // Anzeige unter der Punkteanzeige
 }
+
 
 void displayWinScreen() {
   // Bonuspunkte nur einmal vergeben, wenn das Spiel gewonnen wurde

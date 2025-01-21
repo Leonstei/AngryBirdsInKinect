@@ -34,7 +34,7 @@ class Bird {
     }
 
     BodyDef bd = new BodyDef();
-    bd.type = BodyType.DYNAMIC;
+    bd.type = BodyType.STATIC; // Initially, the bird is static and locked in place
     bd.position = box2d.coordPixelsToWorld(x, y);
 
     CircleShape cs = new CircleShape();
@@ -49,8 +49,6 @@ class Bird {
     body = box2d.createBody(bd);
     body.createFixture(fd);
 
-    // Initially, the bird is static and locked in place
-    body.setType(BodyType.STATIC);
   }
 
   PVector getPixelPosition() {
